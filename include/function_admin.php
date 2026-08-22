@@ -39,7 +39,7 @@ function getVideoDuration( $vid )
     $flv = $config['FLVDO_DIR']. '/' .$vid. '.flv';
     if ( file_exists($flv) ) {
         exec($config['mplayer']. ' -vo null -ao null -frames 0 -identify "' .$flv. '"', $p);
-        while ( list($k,$v) = each($p) ) {
+        foreach ($p as $v) {
             if ( $length = strstr($v, 'ID_LENGTH=') ) {
                 break;
             }

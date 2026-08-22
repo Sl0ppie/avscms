@@ -406,7 +406,6 @@ if (isset($_FILES['image_field']) ? $_FILES['image_field'] : '') {
 			<input class="button" type="button" name="Continue" value="'.$lang['ok'].'" onClick="document.location.replace(\''.WP_WEB_DIRECTORY.'image.php'.$query_string.'\')">
 			</form>
 			</div>');
-			break;
 		}
 		if ($_FILES['image_field']['size'] >= $max_file_size) {
 			image_exit ('<p>&nbsp;</p>

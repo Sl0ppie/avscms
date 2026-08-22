@@ -585,7 +585,20 @@ function email_encode2 ($email_address) {
 	return strtr($email_address, $trans_array);    
 }
 function email_encode($code) {
-	$code = preg_replace ("/<a(.*?)href=\"(mailto:.*?)\"(.*?)>(.*?)([a-zA-Z0-9_\.-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,4})(.*?)<\/a>/e", "'<a' . stripslashes('$1') . 'href=\"' . email_encode2('$2') . '\"' . stripslashes('$3') . '>' . stripslashes('$4') . email_encode2('$5') .  stripslashes('$6') . '</a>'", $code);
-	return preg_replace ("/a(.*?)href=\"(mailto:.*?)\"(.*?)>/e", "'a' . stripslashes('$1') . 'href=\"' . email_encode2('$2') . '\"' . stripslashes('$3') . '>'", $code);
+	$code = preg_replace_callback(
+		"/<a(.*?)href=\"(mailto:.*?)\"(.*?)>(.*?)([a-zA-Z0-9_\.-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,4})(.*?)<\/a>/",
+		function ($matches) {
+			return '<a' . stripslashes($matches[1]) . 'href="' . email_encode2($matches[2]) . '"' . stripslashes($matches[3]) . '>' . stripslashes($matches[4]) . email_encode2($matches[5]) . stripslashes($matches[6]) . '</a>';
+		},
+		$code
+	);
+
+	return preg_replace_callback(
+		"/<a(.*?)href=\"(mailto:.*?)\"(.*?)>/",
+		function ($matches) {
+			return '<a' . stripslashes($matches[1]) . 'href="' . email_encode2($matches[2]) . '"' . stripslashes($matches[3]) . '>';
+		},
+		$code
+	);
 }
 ?>
