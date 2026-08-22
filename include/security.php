@@ -1,18 +1,21 @@
 <?php
 defined('_VALID') or die('Restricted Access!');
 
-if ( get_magic_quotes_gpc() ) {
-    $in = array(&$_GET, &$_POST, &$_COOKIE);
-    while ( list($k,$v) = each($in) ) {
-        foreach ($v as $key => $val) {
-            if (!is_array($val)) {
-                $in[$k][$key] = stripslashes($val);
-                continue;
-            }
-            $in[] =& $in[$k][$key];
+if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) {
+    $strip_slashes = function (&$value) use (&$strip_slashes) {
+        if (!is_array($value)) {
+            $value = stripslashes($value);
+            return;
         }
-    }
-    unset($in);
+
+        foreach ($value as &$nested) {
+            $strip_slashes($nested);
+        }
+    };
+
+    $strip_slashes($_GET);
+    $strip_slashes($_POST);
+    $strip_slashes($_COOKIE);
 }
 
 function disableRegisterGlobals()

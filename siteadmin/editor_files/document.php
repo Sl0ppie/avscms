@@ -405,7 +405,6 @@ if (isset($_FILES['document_field']) ? $_FILES['document_field'] : '') {
 			<input class="button" type="button" name="Continue" value="'.$lang['ok'].'" onClick="document.location.replace(\''.WP_WEB_DIRECTORY.'document.php'.$query_string.'\')">
 			</form>
 			</div>');
-			break;
 		}
 		// check if there is an icon for this filetype and whether we can safely show a preview of it.
 		$file_info = wp_get_fileinfo($extension);
