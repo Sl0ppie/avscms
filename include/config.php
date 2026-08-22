@@ -172,12 +172,17 @@ if (defined('_ADMIN')) {
 	$sub_menu = '';
 	
 	$plugin_files = scandir($config['BASE_DIR']. '/templates/backend/'.$config['template_admin'].'/leftmenu/plugins/');
-	foreach ($plugin_files as $k => $v) {
-		if ($v == '.' || $v == '..') {
-			unset($plugin_files[$k]);
-		}
+	if ($plugin_files === false) {
+		$plugin_files = array();
 	}
-	$plugin_files = array_values($plugin_files);
+	else {
+		foreach ($plugin_files as $k => $v) {
+			if ($v == '.' || $v == '..') {
+				unset($plugin_files[$k]);
+			}
+		}
+		$plugin_files = array_values($plugin_files);
+	}
 	$smarty->assign('plugin_files', $plugin_files);
 
 	//-Notifications
