@@ -594,9 +594,9 @@ function email_encode($code) {
 	);
 
 	return preg_replace_callback(
-		"/a(.*?)href=\"(mailto:.*?)\"(.*?)>/",
+		"/<a(.*?)href=\"(mailto:.*?)\"(.*?)>/",
 		function ($matches) {
-			return 'a' . stripslashes($matches[1]) . 'href="' . email_encode2($matches[2]) . '"' . stripslashes($matches[3]) . '>';
+			return '<a' . stripslashes($matches[1]) . 'href="' . email_encode2($matches[2]) . '"' . stripslashes($matches[3]) . '>';
 		},
 		$code
 	);
