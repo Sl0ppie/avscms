@@ -3628,8 +3628,12 @@ class PHPMailer
             //Is it a valid IPv4 address?
             return (bool) filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
         }
-        $hostRequiredFlag = defined('FILTER_FLAG_HOST_REQUIRED') ? FILTER_FLAG_HOST_REQUIRED : 0;
-        if (filter_var('http://' . $host, FILTER_VALIDATE_URL, $hostRequiredFlag)) {
+        if (
+            (defined('FILTER_FLAG_HOST_REQUIRED') &&
+                filter_var('http://' . $host, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED)) ||
+            (!defined('FILTER_FLAG_HOST_REQUIRED') &&
+                filter_var('http://' . $host, FILTER_VALIDATE_URL))
+        ) {
             //Is it a syntactically valid hostname?
             return true;
         }
