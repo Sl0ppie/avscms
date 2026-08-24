@@ -1087,6 +1087,21 @@ CREATE TABLE `video_subscribe` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `wall`
+--
+
+CREATE TABLE `wall` (
+  `wall_id` bigint(20) NOT NULL,
+  `UID` bigint(20) NOT NULL DEFAULT '0',
+  `OID` bigint(20) NOT NULL DEFAULT '0',
+  `message` text,
+  `addtime` bigint(20) NOT NULL DEFAULT '0',
+  `status` enum('1','0') NOT NULL DEFAULT '1'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `wall_comments`
 --
 
@@ -1565,6 +1580,15 @@ ALTER TABLE `video_subscribe`
   ADD KEY `USUID` (`UID`,`SUID`);
 
 --
+-- Indexes for table `wall`
+--
+ALTER TABLE `wall`
+  ADD PRIMARY KEY (`wall_id`),
+  ADD KEY `OID` (`OID`),
+  ADD KEY `UID` (`UID`),
+  ADD KEY `status` (`status`);
+
+--
 -- Indexes for table `wall_comments`
 --
 ALTER TABLE `wall_comments`
@@ -1774,6 +1798,12 @@ ALTER TABLE `video_comments`
 --
 ALTER TABLE `video_flags`
   MODIFY `FID` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `wall`
+--
+ALTER TABLE `wall`
+  MODIFY `wall_id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `wall_comments`
