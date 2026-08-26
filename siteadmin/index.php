@@ -23,7 +23,7 @@ $module_template    = 'index.tpl';
 $modules_allowed    = array('dashboard', 'admin', 'main', 'check', 'mail', 'modules', 'static', 'media', 'encoding', 'encodingadd', 'encodingedit', 'miscellaneous', 'permissions', 'sessions', 'bandwidth',
                             'bans', 'emails', 'emailadd', 'emailedit', 'advgroups', 'advs', 'advadd', 'advgroupedit', 'advedit',
 							'advpause', 'advtext', 'advpauseadd', 'advtextadd', 'advtextedit', 'advpauseedit', 'player', 'playeradd', 'playeredit', 'userpermisions', 'socialsignin', 'captcha', 'logo', 'playerlogo', 'analytics', 'advvastvpaid', 'advvastvpaidadd', 'advvastvpaidedit',
-							'update', 'update-step1', 'update-step2', 'update-step3');
+							'update', 'update-step1', 'update-step2', 'update-step3', 'adminusers', 'adminusersadd', 'adminusersedit', 'activitylog');
 if ( in_array($module, $modules_allowed) ) {
     $module_template = ( $module == 'dashboard' ) ? 'index.tpl' : 'index_' .$module. '.tpl';
     require 'modules/index/' .$module. '.php';
@@ -38,7 +38,7 @@ if ( in_array($module, array('dashboard')) ) {
 	$sub_menu = 'general';
 } elseif ( in_array($module, array('media', 'encoding', 'encodingadd', 'encodingedit')) ) {
 	$sub_menu = 'video-conversion';
-} elseif ( in_array($module, array('modules', 'permissions', 'bandwidth', 'sessions', 'bans', 'userpermisions')) ) {
+} elseif ( in_array($module, array('modules', 'permissions', 'bandwidth', 'sessions', 'bans', 'userpermisions', 'adminusers', 'adminusersadd', 'adminusersedit', 'activitylog')) ) {
 	$sub_menu = 'security';
 } elseif ( in_array($module, array('emails', 'emailadd', 'emailedit')) ) {
 	$sub_menu = 'email-templates';
@@ -58,6 +58,14 @@ $smarty->assign('messages', $messages);
 $smarty->assign('warnings', $warnings);
 $smarty->assign('active_menu', $active_menu);
 $smarty->assign('sub_menu', $sub_menu);
+$admin_role = Auth::getAdminRole();
+$is_superadmin = Auth::isSuperAdmin();
+$smarty->assign('admin_role', $admin_role);
+$smarty->assign('is_superadmin', $is_superadmin);
+if (isset($_SESSION['AUSERNAME']) && $_SESSION['AUSERNAME'] != '') {
+	$smarty->assign('admin_name', $_SESSION['AUSERNAME']);
+}
+
 $smarty->display('header.tpl');
 $smarty->display('leftmenu/menu.tpl');
 $smarty->display($module_template);

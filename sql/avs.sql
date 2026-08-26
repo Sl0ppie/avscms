@@ -108,6 +108,43 @@ CREATE TABLE `adv_vast_vpaid` (
 
 -- --------------------------------------------------------
 
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_activity_log`
+--
+
+CREATE TABLE `admin_activity_log` (
+  `id` int(11) NOT NULL,
+  `admin_id` int(11) NOT NULL,
+  `admin_username` varchar(100) NOT NULL,
+  `action` varchar(255) NOT NULL,
+  `module` varchar(100) NOT NULL,
+  `details` text,
+  `ip_address` varchar(45) NOT NULL DEFAULT '',
+  `created_at` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin_users`
+--
+
+CREATE TABLE `admin_users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `role` enum('superadmin','admin') NOT NULL DEFAULT 'admin',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `last_login` datetime DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `aembedder`
 --
@@ -1144,6 +1181,26 @@ CREATE TABLE `wall_comments_vote_users` (
 -- Indexes for dumped tables
 --
 
+
+--
+-- Indexes for table `admin_activity_log`
+--
+ALTER TABLE `admin_activity_log`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `admin_id` (`admin_id`),
+  ADD KEY `module` (`module`),
+  ADD KEY `created_at` (`created_at`);
+
+--
+-- Indexes for table `admin_users`
+--
+ALTER TABLE `admin_users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD KEY `email` (`email`),
+  ADD KEY `role` (`role`),
+  ADD KEY `is_active` (`is_active`);
+
 --
 -- Indexes for table `adv`
 --
@@ -1612,6 +1669,19 @@ ALTER TABLE `wall_comments_vote_users`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+
+--
+-- AUTO_INCREMENT for table `admin_activity_log`
+--
+ALTER TABLE `admin_activity_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `admin_users`
+--
+ALTER TABLE `admin_users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `adv`

@@ -6,6 +6,7 @@ require $config['BASE_DIR']. '/include/compat/json.php';
 require $config['BASE_DIR']. '/include/adodb/adodb.inc.php';
 require $config['BASE_DIR']. '/include/dbconn.php';
 require $config['BASE_DIR']. '/classes/auth.class.php';
+require $config['BASE_DIR']. '/classes/adminlog.class.php';
 Auth::checkAdmin();
 
 $response = array('status' => 0);
@@ -19,6 +20,7 @@ if ($bstatus) {
 	$conn->execute($sql);
 	if ( $conn->Affected_Rows() == 1 ) {	
 		$response['status'] = 1;	
+		AdminLog::write('Unpublished blog #' .$bid, 'blogs', 'Set blog status=0');
 	}
 } else {
 	$sql = "UPDATE blog SET status = '1' WHERE BID = " .$conn->qStr($bid). " LIMIT 1";
@@ -26,6 +28,7 @@ if ($bstatus) {
 	if ( $conn->Affected_Rows() == 1 ) {
 		//send_blog_approve_email($bid);
 		$response['status'] = 1;
+		AdminLog::write('Published blog #' .$bid, 'blogs', 'Set blog status=1');
 	}
 }
 
