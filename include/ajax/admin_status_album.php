@@ -7,6 +7,7 @@ require $config['BASE_DIR']. '/include/adodb/adodb.inc.php';
 require $config['BASE_DIR']. '/include/dbconn.php';
 require $config['BASE_DIR']. '/include/function_video.php';
 require $config['BASE_DIR']. '/classes/auth.class.php';
+require $config['BASE_DIR']. '/classes/adminlog.class.php';
 Auth::checkAdmin();
 
 $response = array('status' => 0);
@@ -19,13 +20,15 @@ if ($astatus) {
 	$sql = "UPDATE albums SET status = '0' WHERE AID = " .$conn->qStr($aid). " LIMIT 1";
 	$conn->execute($sql);
 	if ( $conn->Affected_Rows() == 1 ) {	
-		$response['status'] = 1;	
+		$response['status'] = 1;
+		AdminLog::write('Unpublished album #' .$aid, 'albums', 'Set album status=0');
 	}
 } else {
 	$sql = "UPDATE albums SET status = '1' WHERE AID = " .$conn->qStr($aid). " LIMIT 1";
 	$conn->execute($sql);
 	if ( $conn->Affected_Rows() == 1 ) {
 		$response['status'] = 1;
+		AdminLog::write('Published album #' .$aid, 'albums', 'Set album status=1');
 	}
 }
 

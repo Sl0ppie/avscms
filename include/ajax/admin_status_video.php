@@ -7,6 +7,7 @@ require $config['BASE_DIR']. '/include/adodb/adodb.inc.php';
 require $config['BASE_DIR']. '/include/dbconn.php';
 require $config['BASE_DIR']. '/include/function_video.php';
 require $config['BASE_DIR']. '/classes/auth.class.php';
+require $config['BASE_DIR']. '/classes/adminlog.class.php';
 Auth::checkAdmin();
 
 $response = array('status' => 0);
@@ -20,6 +21,7 @@ if ($vstatus) {
 	$conn->execute($sql);
 	if ( $conn->Affected_Rows() == 1 ) {	
 		$response['status'] = 1;	
+		AdminLog::write('Unpublished video #' .$vid, 'videos', 'Set video active=0');
 	}
 } else {
 	$sql = "UPDATE video SET active = '1' WHERE VID = " .$conn->qStr($vid). " LIMIT 1";
@@ -27,6 +29,7 @@ if ($vstatus) {
 	if ( $conn->Affected_Rows() == 1 ) {
 		//send_video_approve_email($vid);
 		$response['status'] = 1;
+		AdminLog::write('Published video #' .$vid, 'videos', 'Set video active=1');
 	}
 }
 

@@ -3,12 +3,22 @@ defined('_VALID') or die('Restricted Access!');
 
 require 'version.php';
 require_once ($config['BASE_DIR']. '/include/function_thumbs.php');
+require_once ($config['BASE_DIR']. '/classes/auth.class.php');
+require_once ($config['BASE_DIR']. '/classes/adminlog.class.php');
 
 // send hears - we dont cache anything in siteadmin
 header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Cache-Control: post-check=0, pre-check=0', false);
 header('Pragma: no-cache');
+
+if (isset($_SESSION['AUSERNAME']) && $_SESSION['AUSERNAME'] != '' && isset($smarty) && is_object($smarty)) {
+	$smarty->assign('admin_name', $_SESSION['AUSERNAME']);
+}
+if (isset($_SESSION['AROLE']) && isset($smarty) && is_object($smarty)) {
+	$smarty->assign('admin_role', $_SESSION['AROLE']);
+	$smarty->assign('is_superadmin', ($_SESSION['AROLE'] == 'superadmin'));
+}
 
 function channelExists( $chid, $section = '' )
 {
@@ -147,6 +157,8 @@ function deleteVideo( $vid )
 			remove_tags($keyword);
 		}
 	}
+
+	AdminLog::write('Deleted video #' .$vid, 'videos', 'Video removed with related files and metadata');
 }
 
 function deleteAlbum( $aid )
@@ -187,7 +199,9 @@ function deleteAlbum( $aid )
 	if ( file_exists($file) ) {
 		@chmod($file, 0777);
 		@unlink($file);
-	}    
+	}
+
+	AdminLog::write('Deleted album #' .$aid, 'albums', 'Album and related photos were deleted');
 }
 
 function albumExists( $aid )
@@ -422,6 +436,8 @@ function update_config( $config )
         fwrite($fp, $data, $len);
         flock($fp, LOCK_UN);
         fclose($fp);
+
+        AdminLog::write('Updated configuration settings', 'settings', 'Configuration file was updated');
     }
 }
 
@@ -540,7 +556,8 @@ function deleteUser( $uid )
 		@chmod($file, 0777);
 		@unlink($file);
 	}	
-	
+
+	AdminLog::write('Deleted user #' .$uid, 'users', 'User account and related content were deleted');
 }
 
 function deleteBlog( $bid )
@@ -557,6 +574,8 @@ function deleteBlog( $bid )
     $conn->execute($sql);
     $sql    = "DELETE FROM blog WHERE BID = " .$bid. " LIMIT 1";
     $conn->execute($sql);
+
+    AdminLog::write('Deleted blog #' .$bid, 'blogs', 'Blog and comments were deleted');
 }
 
 function deleteNotice( $nid )
@@ -575,6 +594,8 @@ function deleteNotice( $nid )
     $conn->execute($sql);
     $sql    = "DELETE FROM notice WHERE NID = " .$nid. " LIMIT 1";
     $conn->execute($sql);
+
+    AdminLog::write('Deleted notice #' .$nid, 'notices', 'Notice and comments were deleted');
 }
 
 function upload_video_ftp( $video_id )
@@ -876,7 +897,9 @@ function deletePhoto( $pid ) {
 	$conn->execute($sql);
 	$sql    = "DELETE FROM spam WHERE type = 'photo' AND parent_id = " .$pid;
 	$conn->execute($sql);
-	
+
+	AdminLog::write('Deleted photo #' .$pid, 'albums', 'Photo was deleted from album #' .$aid);
+
 	return $aid;
 
 }

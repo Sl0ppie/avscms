@@ -6,6 +6,7 @@ require $config['BASE_DIR']. '/include/compat/json.php';
 require $config['BASE_DIR']. '/include/adodb/adodb.inc.php';
 require $config['BASE_DIR']. '/include/dbconn.php';
 require $config['BASE_DIR']. '/classes/auth.class.php';
+require $config['BASE_DIR']. '/classes/adminlog.class.php';
 Auth::checkAdmin();
 
 $response = array('status' => 0);
@@ -19,12 +20,14 @@ if ($ustatus) {
 	$conn->execute($sql);
 	if ( $conn->Affected_Rows() == 1 ) {	
 		$response['status'] = 1;	
+		AdminLog::write('Deactivated user #' .$uid, 'users', 'Set account_status to Inactive');
 	}
 } else {
 	$sql = "UPDATE signup SET account_status = 'Active' WHERE UID = " .$conn->qStr($uid). " LIMIT 1";
 	$conn->execute($sql);
 	if ( $conn->Affected_Rows() == 1 ) {
 		$response['status'] = 1;
+		AdminLog::write('Activated user #' .$uid, 'users', 'Set account_status to Active');
 	}
 }
 

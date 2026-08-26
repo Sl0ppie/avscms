@@ -14,3 +14,10 @@ It is a simple and powerful web server application which requires a server with 
 You can find full technical requirements [here](https://www.avscms.com/product/features/).
 
 AVSCMS! is now free and Open Source software distributed under the GNU General Public License v3.0 or later.
+
+## Admin migration
+
+Run `php scripts/migrate_admin_users.php` once to create `admin_users` and `admin_activity_log` and migrate the legacy admin login into a `superadmin` account.
+
+After validating the new admin login works, you can remove `admin_name` and `admin_pass` from `include/config.local.php`.
+

@@ -36,6 +36,8 @@
 							<li class="{if $module == 'bandwidth'}active{/if}"><a href="index.php?m=bandwidth">Bandwidth</a></li>
 							<li class="{if $module == 'sessions'}active{/if}"><a href="index.php?m=sessions">Sessions</a></li>
 							<li class="{if $module == 'bans'}active{/if}"><a href="index.php?m=bans&all=1">Bans</a></li>
+							{if $is_superadmin}<li class="{if $module == 'adminusers' || $module == 'adminusersadd' || $module == 'adminusersedit'}active{/if}"><a href="index.php?m=adminusers">Admin Users</a></li>{/if}
+							<li class="{if $module == 'activitylog'}active{/if}"><a href="index.php?m=activitylog">Activity Log</a></li>
 						</ul>
 					</li>
 					<li class="{if $sub_menu == 'email-templates'}open active{/if}">

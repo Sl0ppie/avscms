@@ -53,7 +53,7 @@
 								{/section}
 							</p>
 						{/if}						
-						<a id="remember_account" href="#">Trouble login in?</a>&nbsp;&nbsp;
+						<a id="remember_account" href="#">Need password help?</a>&nbsp;&nbsp;
 					</div>
 				</div>
 		  
@@ -62,7 +62,7 @@
 		<div class="tiles grey p-t-20 p-b-20  p-l-30 p-r-30 text-black">
 		  <input type="submit" name="submit_login" class="btn btn-primary btn-cons" value="Login" />
 		  <span id="submit_forgot" style="display:none" >
-			<input type="submit" name="submit_forgot" class="btn btn-info btn-cons" value="Remember Password" />
+			<input type="submit" name="submit_forgot" class="btn btn-info btn-cons" value="Send Help Email" />
 		  <span>
 		</div>   
 		</form>		
