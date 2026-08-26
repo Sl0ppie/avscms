@@ -17,6 +17,7 @@ if (!$rs || $conn->Affected_Rows() == 0) {
 
 $page   = (isset($_GET['page'])) ? intval($_GET['page']) : 1;
 $remove = NULL;
+$remove_action = false;
 
 if ( isset($_GET['a']) ) {
     $action  = trim($_GET['a']);
@@ -45,21 +46,25 @@ if ( isset($_GET['a']) ) {
                     $conn->execute($sql);
                     $messages[] = 'Admin user was deactivated successfully.';
                     AdminLog::write('Deactivated admin user #' .$adminid, 'adminusers', 'Soft deleted admin account ' .$admin_row['username']);
+                    $remove_action = true;
                 } elseif ($action == 'harddelete') {
                     $sql = "DELETE FROM admin_users WHERE id = " .$adminid. " LIMIT 1";
                     $conn->execute($sql);
                     $messages[] = 'Admin user was deleted successfully.';
                     AdminLog::write('Deleted admin user #' .$adminid, 'adminusers', 'Hard deleted admin account ' .$admin_row['username']);
+                    $remove_action = true;
                 } elseif ($action == 'activate') {
                     $sql = "UPDATE admin_users SET is_active = 1 WHERE id = " .$adminid. " LIMIT 1";
                     $conn->execute($sql);
                     $messages[] = 'Admin user was activated successfully.';
                     AdminLog::write('Activated admin user #' .$adminid, 'adminusers', 'Activated admin account ' .$admin_row['username']);
+                    $remove_action = true;
                 } elseif ($action == 'deactivate') {
                     $sql = "UPDATE admin_users SET is_active = 0 WHERE id = " .$adminid. " LIMIT 1";
                     $conn->execute($sql);
                     $messages[] = 'Admin user was deactivated successfully.';
                     AdminLog::write('Deactivated admin user #' .$adminid, 'adminusers', 'Deactivated admin account ' .$admin_row['username']);
+                    $remove_action = true;
                 }
             } else {
                 $errors[] = 'Admin user does not exist!';
@@ -69,8 +74,11 @@ if ( isset($_GET['a']) ) {
         $errors[] = 'Invalid admin user id!';
     }
 
-    $remove = '&a=' .$action. '&AID=' .$adminid;
+    if ($remove_action) {
+        $remove = '&a=' .$action. '&AID=' .$adminid;
+    }
 }
+
 
 $role_filter   = (isset($_GET['role'])) ? trim($_GET['role']) : '';
 $status_filter = (isset($_GET['status'])) ? trim($_GET['status']) : '';

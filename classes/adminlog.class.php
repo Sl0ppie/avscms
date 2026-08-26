@@ -27,12 +27,7 @@ class AdminLog
     private static function getClientIp()
     {
         $ip = '';
-        if (isset($_SERVER['HTTP_CF_CONNECTING_IP']) && $_SERVER['HTTP_CF_CONNECTING_IP'] != '') {
-            $ip = trim($_SERVER['HTTP_CF_CONNECTING_IP']);
-        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != '') {
-            $parts = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            $ip    = trim($parts[0]);
-        } elseif (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] != '') {
+        if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] != '') {
             $ip = trim($_SERVER['REMOTE_ADDR']);
         }
 

@@ -63,8 +63,10 @@ if ( isset($_POST['submit_login']) ) {
                     $valid = password_verify($password, $hash);
                 }
 
-                if (!$valid && $password === $hash) {
+                $looks_like_bcrypt = (bool) preg_match('/^\$2[ayb]\$[0-9]{2}\$/', substr($hash, 0, 7));
+                if (!$valid && !$looks_like_bcrypt && $password === $hash) {
                     $valid = true;
+                    AdminLog::write('Legacy password fallback login #' .intval($rs->fields['id']), 'auth', 'Account used plaintext legacy password fallback and was re-hashed');
                     if (function_exists('password_hash')) {
                         $new_hash = password_hash($password, PASSWORD_BCRYPT);
                         if ($new_hash) {

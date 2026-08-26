@@ -3,12 +3,19 @@ defined('_VALID') or die('Restricted Access!');
 
 Auth::requireSuperAdmin();
 
+function hash_admin_password($password)
+{
+    if (function_exists('password_hash')) {
+        return password_hash($password, PASSWORD_BCRYPT);
+    }
+
+    $salt = '$2y$10$' . substr(str_replace('+', '.', base64_encode(md5(uniqid(mt_rand(), true), true))), 0, 22);
+    return crypt($password, $salt);
+}
+
 $rs = $conn->execute("SHOW TABLES LIKE 'admin_users'");
 if (!$rs || $conn->Affected_Rows() == 0) {
     $errors[] = 'admin_users table was not found. Run scripts/migrate_admin_users.php first.';
-    $smarty->assign('admins', array());
-    $smarty->assign('admins_total', 0);
-    $smarty->assign('paging', '');
     $smarty->assign('admin', array());
     return;
 }
@@ -33,11 +40,13 @@ if ( isset($_POST['add_admin_user']) ) {
         $err['username'] = 1;
     }
 
-    $sql = "SELECT id FROM admin_users WHERE username = " .$conn->qStr($admin['username']). " LIMIT 1";
-    $conn->execute($sql);
-    if ($conn->Affected_Rows() > 0) {
-        $errors[] = 'Username already exists!';
-        $err['username'] = 1;
+    if (!isset($err['username'])) {
+        $sql = "SELECT id FROM admin_users WHERE username = " .$conn->qStr($admin['username']). " LIMIT 1";
+        $conn->execute($sql);
+        if ($conn->Affected_Rows() > 0) {
+            $errors[] = 'Username already exists!';
+            $err['username'] = 1;
+        }
     }
 
     if ($admin['email'] == '') {
@@ -67,10 +76,7 @@ if ( isset($_POST['add_admin_user']) ) {
     }
 
     if (!$errors) {
-        $password_hash = $password;
-        if (function_exists('password_hash')) {
-            $password_hash = password_hash($password, PASSWORD_BCRYPT);
-        }
+        $password_hash = hash_admin_password($password);
 
         $sql = "INSERT INTO admin_users (username, password, email, role, is_active, created_at)
                 VALUES (" .$conn->qStr($admin['username']). ", " .$conn->qStr($password_hash). ", " .$conn->qStr($admin['email']). ",

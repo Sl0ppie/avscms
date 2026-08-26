@@ -63,7 +63,7 @@
 		  <input type="submit" name="submit_login" class="btn btn-primary btn-cons" value="Login" />
 		  <span id="submit_forgot" style="display:none" >
 			<input type="submit" name="submit_forgot" class="btn btn-info btn-cons" value="Send Help Email" />
-		  <span>
+		  </span>
 		</div>   
 		</form>		
       </div>   

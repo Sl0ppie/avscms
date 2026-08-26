@@ -55,7 +55,11 @@ $logs = $rs->getrows();
 
 $admin_options = array();
 if ($admin_role == 'superadmin') {
-    $sql = "SELECT id, username FROM admin_users ORDER BY username ASC";
+    $sql = "SELECT DISTINCT u.id, u.username
+            FROM admin_users AS u, admin_activity_log AS l
+            WHERE l.admin_id = u.id
+            ORDER BY u.username ASC
+            LIMIT 500";
     $rs = $conn->execute($sql);
     $admin_options = $rs->getrows();
 }
