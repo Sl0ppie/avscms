@@ -2,8 +2,8 @@
 define('_VALID', true);
 define('_ADMIN', true);
 include('../include/config.php');
-require '../classes/auth.class.php';
-require '../classes/adminlog.class.php';
+require_once '../classes/auth.class.php';
+require_once '../classes/adminlog.class.php';
 
 function admin_users_table_exists()
 {

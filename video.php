@@ -8,7 +8,7 @@ require 'classes/pagination.class.php';
 require 'include/function_user.php';
 
 if ( $config['video_view'] == 'registered' ) {
-    require 'classes/auth.class.php';
+    require_once 'classes/auth.class.php';
     Auth::check_();
 }
 

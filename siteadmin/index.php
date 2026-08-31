@@ -3,9 +3,9 @@ define('_VALID', true);
 define('_ADMIN', true);
 require '../include/config.php';
 require '../include/function_admin.php';
-require '../classes/validation.class.php';
-require '../classes/auth.class.php';
-require '../classes/filter.class.php';
+require_once '../classes/validation.class.php';
+require_once '../classes/auth.class.php';
+require_once '../classes/filter.class.php';
 require '../include/function_update.php';
 
 Auth::checkAdmin();

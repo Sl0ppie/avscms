@@ -3,7 +3,7 @@ define('_VALID', true);
 require 'include/config.php';
 require 'include/function_global.php';
 require 'include/function_smarty.php';
-require 'classes/auth.class.php';
+require_once 'classes/auth.class.php';
 require 'classes/filter.class.php';
 
 if ( $config['video_module'] == '0' ) {

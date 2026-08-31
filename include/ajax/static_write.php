@@ -2,7 +2,7 @@
 defined('_VALID') or die('Restricted Access!');
 
 require $config['BASE_DIR']. '/classes/filter.class.php';
-require $config['BASE_DIR']. '/classes/auth.class.php';
+require_once $config['BASE_DIR']. '/classes/auth.class.php';
 
 Auth::checkAdmin();
 

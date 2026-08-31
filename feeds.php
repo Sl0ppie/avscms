@@ -1,7 +1,7 @@
 <?php
 define('_VALID', true);
 require 'include/config.php';
-require 'classes/auth.class.php';
+require_once 'classes/auth.class.php';
 require 'include/function_global.php';
 require 'include/function_smarty.php';
 require 'classes/pagination.class.php';
