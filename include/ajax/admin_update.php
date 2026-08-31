@@ -5,7 +5,7 @@ require $config['BASE_DIR']. '/classes/filter.class.php';
 require $config['BASE_DIR']. '/include/compat/json.php';
 require $config['BASE_DIR']. '/include/function_update.php';
 
-require $config['BASE_DIR']. '/classes/auth.class.php';
+require_once $config['BASE_DIR']. '/classes/auth.class.php';
 Auth::checkAdmin();
 
 $response = array('status' => 0, 'msg'=> '');

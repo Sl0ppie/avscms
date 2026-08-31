@@ -5,7 +5,7 @@ require '../include/config.php';
 require '../include/function_global.php';
 require '../include/function_admin.php';
 require '../include/function_smarty.php';
-require '../classes/auth.class.php';
+require_once '../classes/auth.class.php';
 
 if (isset($_GET['VID']) && $_GET['VID'] != '') {
 	$vid = intval($_GET['VID']);

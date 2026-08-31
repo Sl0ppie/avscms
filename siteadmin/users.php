@@ -4,7 +4,7 @@ define('_ADMIN', true);
 require '../include/config.php';
 require '../include/function_admin.php';
 require '../include/function_global.php';
-require '../classes/auth.class.php';
+require_once '../classes/auth.class.php';
 
 Auth::checkAdmin();
 

@@ -10,7 +10,7 @@ $options    = getUserQuery();
 $username   = $options['username'];
 $module     = $options['module'];
 if ( !$username ) {
-    require 'classes/auth.class.php';
+    require_once 'classes/auth.class.php';
     $auth   = new Auth();
     $auth->check();
 }
