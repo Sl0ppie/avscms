@@ -18,6 +18,8 @@ $type    = trim($data['type']);
 $name    = trim($data['name']);
 $slug    = toAscii(trim($data['slug']));
 $counter = $data['counter'];
+$registered_users_only = isset($data['registered_users_only']) ? intval($data['registered_users_only']) : 0;
+$registered_users_only = ($registered_users_only === 1) ? 1 : 0;
 $querry_add = '';
 $total = NULL;
 
@@ -34,7 +36,7 @@ switch ($type) {
 				$total = channelCountItems($id);
 				$querry_add = ", total_videos = " .$conn->qStr($total). "";
 			}			
-			$sql = "UPDATE channel SET name = " .$conn->qStr($name). ", slug = " .$conn->qStr($slug). "" .$querry_add. " WHERE CHID = " .$conn->qStr($id). " LIMIT 1";
+			$sql = "UPDATE channel SET name = " .$conn->qStr($name). ", slug = " .$conn->qStr($slug). ", registered_users_only = " .$conn->qStr($registered_users_only). "" .$querry_add. " WHERE CHID = " .$conn->qStr($id). " LIMIT 1";
 			$conn->execute($sql);
 
 			$response['status'] = 1;			
@@ -46,7 +48,7 @@ switch ($type) {
 				$total = channelCountItems($id, 'album');
 				$querry_add = ", total_albums = " .$conn->qStr($total). "";
 			}			
-			$sql = "UPDATE album_categories SET name = " .$conn->qStr($name). ", slug = " .$conn->qStr($slug). "" .$querry_add. " WHERE CID = " .$conn->qStr($id). " LIMIT 1";
+			$sql = "UPDATE album_categories SET name = " .$conn->qStr($name). ", slug = " .$conn->qStr($slug). ", registered_users_only = " .$conn->qStr($registered_users_only). "" .$querry_add. " WHERE CID = " .$conn->qStr($id). " LIMIT 1";
 			$conn->execute($sql);
 
 			$response['status'] = 1;			
@@ -82,6 +84,7 @@ switch ($type) {
 $response['name'] = $name;
 $response['slug'] = $slug;
 $response['total'] = $total;
+$response['registered_users_only'] = $registered_users_only;
 
 echo json_encode($response);
 die();

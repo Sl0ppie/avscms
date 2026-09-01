@@ -38,7 +38,16 @@
 					<label class="col-lg-3 control-label"></label>
 					<div class="col-lg-9">
 						<div class="checkbox check-default">
-							<input name="edit-update-counter" id="edit-update-counter" type="checkbox" value="1">
+								<input name="edit-registered-users-only" id="edit-registered-users-only" type="checkbox" value="1">
+								<label for="edit-registered-users-only">Registered Users Only</label>
+							</div>
+						</div>
+						<div class="clearfix"></div>
+						<div class="m-b-20"></div>
+						<label class="col-lg-3 control-label"></label>
+						<div class="col-lg-9">
+							<div class="checkbox check-default">
+								<input name="edit-update-counter" id="edit-update-counter" type="checkbox" value="1">
 							<label for="edit-update-counter">Update Counter</label>
 						</div>
 					</div>						
