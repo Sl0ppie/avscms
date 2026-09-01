@@ -82,7 +82,7 @@
 									{if $channels}
 										<form class="form-no-horizontal-spacing" name="category_select" method="post" id="category_select" action="">
 										{section name=i loop=$channels}
-											<div id="item-{$channels[i].CID}" class="item-main-container category">
+											<div id="item-{$channels[i].CID}" class="item-main-container category" data-registered-users-only="{$channels[i].registered_users_only}">
 												<div class="item-col-left">
 													<div class="item-main">
 														<div class="item-thumb">

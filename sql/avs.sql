@@ -199,7 +199,8 @@ CREATE TABLE `album_categories` (
   `CID` bigint(20) NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `slug` varchar(120) NOT NULL DEFAULT '',
-  `total_albums` bigint(20) NOT NULL DEFAULT '0'
+  `total_albums` bigint(20) NOT NULL DEFAULT '0',
+  `registered_users_only` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -284,7 +285,8 @@ CREATE TABLE `channel` (
   `CHID` bigint(20) NOT NULL,
   `name` varchar(120) NOT NULL DEFAULT '',
   `slug` varchar(120) NOT NULL DEFAULT '',
-  `total_videos` bigint(20) NOT NULL DEFAULT '0'
+  `total_videos` bigint(20) NOT NULL DEFAULT '0',
+  `registered_users_only` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

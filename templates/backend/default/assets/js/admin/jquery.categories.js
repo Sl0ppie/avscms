@@ -190,6 +190,8 @@ $(document).ready(function(){
 		$('#edit-type').val(category_type);		
 		$('#edit-name').val($('#title-' + category_id).text());
 		$('#edit-slug').val($('#slug-' + category_id).text());
+		var registeredUsersOnly = $('#item-' + category_id).data('registered-users-only');
+		$('#edit-registered-users-only').prop('checked', registeredUsersOnly == 1);
 		$('#edit-update-counter').attr('checked', false);	
 		
 		//Reset Errors
@@ -215,7 +217,9 @@ $(document).ready(function(){
 		
 		//Load Category Data
 		$('#edit-name').val($('#title-' + category_id).text());
-		$('#edit-slug').val($('#slug-' + category_id).text());	
+		$('#edit-slug').val($('#slug-' + category_id).text());
+		var registeredUsersOnly = $('#item-' + category_id).data('registered-users-only');
+		$('#edit-registered-users-only').prop('checked', registeredUsersOnly == 1);
 		$('#edit-update-counter').attr('checked', false);		
 				
 	});	
@@ -233,11 +237,12 @@ $(document).ready(function(){
 			//save code
 			$('#edit_category_' + category_id).html('<i class="small-loader"></i>');			
 			var categoryData = {
-				id 		     : $('#edit-id').val(),
-				type	     : $('#edit-type').val(),
-				name 		 : $('#edit-name').val(),
-				slug		 : $('#edit-slug').val(),
-				counter 	 : counter
+				id 		     		  : $('#edit-id').val(),
+				type	     		  : $('#edit-type').val(),
+				name 		 		  : $('#edit-name').val(),
+				slug		 		  : $('#edit-slug').val(),
+				counter 	 		  : counter,
+				registered_users_only : $('#edit-registered-users-only').is(":checked") ? 1 : 0
 			};
 			
 			$.post(base_url + '/ajax/admin_save_category', { data: categoryData },
@@ -250,6 +255,7 @@ $(document).ready(function(){
 						});
 						$('#title-' + category_id).text(response.name);
 						$('#slug-' + category_id).text(response.slug);
+						$('#item-' + category_id).data('registered-users-only', response.registered_users_only);
 						if (response.total != null) {
 							$('#total-items-' + category_id).text(response.total);
 						}

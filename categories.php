@@ -6,7 +6,7 @@ require 'include/function_smarty.php';
 $s      = ( isset($_GET['s']) && ($_GET['s'] == 'a' or $_GET['s'] == 'g') ) ? $_GET['s'] : '';
 
 if ($s == "a") {
-	$sql            = "SELECT CID, name, slug FROM album_categories ORDER BY name ASC";
+	$sql            = "SELECT CID, name, slug FROM album_categories" . (!isset($_SESSION['uid']) ? " WHERE registered_users_only = '0'" : "") . " ORDER BY name ASC";
 	$rs             = $conn->execute($sql);
 	$categories     = $rs->getrows();
 
@@ -31,7 +31,7 @@ if ($s == "a") {
 	}
 	
 } else {
-	$sql            = "SELECT CHID, name, slug FROM channel ORDER BY name ASC";
+	$sql            = "SELECT CHID, name, slug FROM channel" . (!isset($_SESSION['uid']) ? " WHERE registered_users_only = '0'" : "") . " ORDER BY name ASC";
 	$rs             = $conn->execute($sql);
 	$categories     = $rs->getrows();
 

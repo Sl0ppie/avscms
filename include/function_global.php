@@ -28,7 +28,8 @@ function get_categories()
 {
     global $conn;
     
-    $sql        = "SELECT CHID, name, slug FROM channel ORDER BY name ASC";
+    $where = (!defined('_ADMIN') && !isset($_SESSION['uid'])) ? " WHERE registered_users_only = '0'" : "";
+    $sql        = "SELECT CHID, name, slug FROM channel" . $where . " ORDER BY name ASC";
     $rs         = $conn->execute($sql);
     $categories = $rs->getrows();
     
@@ -39,7 +40,8 @@ function get_albums_categories()
 {
     global $conn;
     
-    $sql        = "SELECT CID, name, slug FROM album_categories ORDER BY name ASC";
+    $where = (!defined('_ADMIN') && !isset($_SESSION['uid'])) ? " WHERE registered_users_only = '0'" : "";
+    $sql        = "SELECT CID, name, slug FROM album_categories" . $where . " ORDER BY name ASC";
     $rs         = $conn->execute($sql);
     $categories = $rs->getrows();
     
