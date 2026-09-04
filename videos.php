@@ -7,10 +7,11 @@ require 'classes/pagination.class.php';
 
 $slug = get_request_arg('videos', 'STRING');
 if ($slug != '') {
-	$sql            = "SELECT CHID FROM channel WHERE slug = '".$slug."' LIMIT 1";
+	$sql            = "SELECT * FROM channel WHERE slug = '".$slug."' LIMIT 1";
 	$rs             = $conn->execute($sql);
 	if ($conn->Affected_Rows()) {
 		$cat_id         = $rs->fields['CHID'];
+		$cat_endpoint 	= @$rs->fields['endpoint'];
 	}
 } else {
 	$cat_id = NULL;
@@ -127,14 +128,27 @@ switch ( $order ) {
         break;		
 }
 
-$sql            = "SELECT count(VID) AS total_videos FROM video" .$sql_add_count;
-$rsc            = $conn->execute($sql);
-$total          = $rsc->fields['total_videos'];
-$pagination     = new Pagination($config['videos_per_page']);
-$limit          = $pagination->getLimit($total);
-$sql            = "SELECT * FROM video" .$sql_add. " LIMIT " .$limit;
-$rs             = $conn->execute($sql);
-$videos         = $rs->getrows();
+if( !$cat_endpoint ) {
+	$sql            = "SELECT count(VID) AS total_videos FROM video" .$sql_add_count;
+	$rsc            = $conn->execute($sql);
+	$total          = $rsc->fields['total_videos'];
+	$pagination     = new Pagination($config['videos_per_page']);
+	$limit          = $pagination->getLimit($total);
+	$sql            = "SELECT * FROM video" .$sql_add. " LIMIT " .$limit;
+	$rs             = $conn->execute($sql);
+	$videos         = $rs->getrows();
+} else {
+
+}
+
+$acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '';
+if( str_contains($acceptHeader, 'application/json') ) {
+	$pageData = (object) [];
+	$pageData->pagination = $pagination;
+	$pageData->videos = $videos;
+	echo json_encode( $pageData );
+	exit();
+}
 
 if ($slug) {
 	$page_link      = $pagination->getPagination('videos/'.$slug);	
