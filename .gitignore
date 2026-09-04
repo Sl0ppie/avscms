@@ -1,0 +1,8 @@
+sitemap.xml
+tmp/logs/*
+media/videos/vid/*
+media/videos/h264/*
+media/categories/video/*
+media/videos/tmb/*
+cache/backend/*
+cache/frontend/*
