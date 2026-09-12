@@ -21,6 +21,8 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$output = array();
 	$prev_page = ( $current_page > 1 ) ? $current_page - 1: 1;
 	$next_page = $current_page+1;
+	$window_start = ( $current_page > $index ) ? $current_page-$index : 1;
+	$window_end = ( ($current_page+$index) < $total_pages ) ? $current_page+$index : $total_pages;
 
 	if ( $current_page != 1 ) {
 		$output[] = '<li class="page-item"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$prev_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($prev_page, 'prev_page'). '><i class="fas fa-caret-left"></i></a></li>';
@@ -32,15 +34,15 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	if ( $current_page > $index+3 ) {
 		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
 	}
-	for ( $i=1; $i<=$total_pages; $i++ ) {
+	for ( $i=$window_start; $i<=$window_end; $i++ ) {
 		if ( $current_page == $i ) {
 			$output[] = '<li class="page-item active" aria-current="page"><span class="page-link">' .$current_page. '</span></li>';
-		} elseif ( ($i >= ($current_page-$index) && $i < $current_page) or ($i <= ($current_page+$index) && $i > $current_page) ) {
+		} else {
 			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator . 'page=' .$i, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($i). '>' .$i. '</a></li>';
 		}
 	}
 
-	$last_rendered_page = $current_page + $index;
+	$last_rendered_page = $window_end;
 	$tail_pages = array();
 	foreach (array($total_pages-2, $total_pages-1, $total_pages) as $tail_page) {
 		if ($tail_page > $last_rendered_page) {
