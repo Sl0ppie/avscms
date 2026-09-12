@@ -25,15 +25,25 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$parser_input = str_replace('<span>&nbsp;...&nbsp;</span><li>', '<span>&nbsp;...&nbsp;</span></li>', $page_link);
 	$document = new DOMDocument('1.0', 'UTF-8');
 	$options = 0;
+	$entity_loader = NULL;
 	$internal_errors = libxml_use_internal_errors(true);
+	if (function_exists('libxml_disable_entity_loader')) {
+		$entity_loader = libxml_disable_entity_loader(true);
+	}
 	if (defined('LIBXML_HTML_NOIMPLIED')) {
 		$options |= LIBXML_HTML_NOIMPLIED;
 	}
 	if (defined('LIBXML_HTML_NODEFDTD')) {
 		$options |= LIBXML_HTML_NODEFDTD;
 	}
+	if (defined('LIBXML_NONET')) {
+		$options |= LIBXML_NONET;
+	}
 	$loaded = $document->loadHTML('<?xml encoding="UTF-8"><ul>' .$parser_input. '</ul>', $options);
 	libxml_clear_errors();
+	if ($entity_loader !== NULL) {
+		libxml_disable_entity_loader($entity_loader);
+	}
 	libxml_use_internal_errors($internal_errors);
 
 	if (!$loaded) {
