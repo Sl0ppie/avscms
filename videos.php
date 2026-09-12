@@ -37,7 +37,7 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 		if (defined('LIBXML_NONET')) {
 			$options |= LIBXML_NONET;
 		}
-		$loaded = $document->loadHTML('<?xml encoding="UTF-8"><ul>' .$parser_input. '</ul>', $options);
+		$loaded = $document->loadHTML('<?xml encoding="UTF-8"><div id="pagination-root">' .$parser_input. '</div>', $options);
 	} finally {
 		libxml_clear_errors();
 		libxml_use_internal_errors($internal_errors);
@@ -47,12 +47,12 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 		return $page_link;
 	}
 
-	$list = $document->getElementsByTagName('ul')->item(0);
-	if (!$list) {
+	$container = $document->getElementById('pagination-root');
+	if (!$container) {
 		return $page_link;
 	}
 
-	foreach ($list->getElementsByTagName('a') as $link) {
+	foreach ($container->getElementsByTagName('a') as $link) {
 		if ($link->getAttribute('href') == $last_page_url) {
 			return $page_link;
 		}
@@ -66,7 +66,7 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$list_item->appendChild($link);
 
 	$next_item = NULL;
-	foreach ($list->childNodes as $child) {
+	foreach ($container->childNodes as $child) {
 		if ($child->nodeName == 'li') {
 			foreach ($child->getElementsByTagName('i') as $icon) {
 				if (strpos($icon->getAttribute('class'), 'fa-caret-right') !== false) {
@@ -78,13 +78,13 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	}
 
 	if ($next_item) {
-		$list->insertBefore($list_item, $next_item);
+		$container->insertBefore($list_item, $next_item);
 	} else {
-		$list->appendChild($list_item);
+		$container->appendChild($list_item);
 	}
 
 	$output = '';
-	foreach ($list->childNodes as $child) {
+	foreach ($container->childNodes as $child) {
 		$output .= $document->saveHTML($child);
 	}
 
