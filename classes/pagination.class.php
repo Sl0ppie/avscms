@@ -68,6 +68,7 @@ class Pagination
         if ( $this->page < ($this->total_pages-6) )
             $output[]   = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span><li>';              
         if ( $this->total_pages > (($index*2)+3) && $this->page <= $this->total_pages-($index+3) ) {
+            $output[]   = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .($this->total_pages-2). '"' .$this->getID(($this->total_pages-2)). '>' .($this->total_pages-2). '</a></li>';
             $output[]   = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .($this->total_pages-1). '"' .$this->getID(($this->total_pages-1)). '>' .($this->total_pages-1). '</a></li>';
             $output[]   = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .$this->total_pages. '"' .$this->getID($this->total_pages). '>' .$this->total_pages. '</a></li>';
         }
@@ -131,6 +132,7 @@ class Pagination
 			if ( $this->page < ($this->total_pages-6) )
 				$output[]   = '<li>..</li>';              
 			if ( $this->total_pages > (($index*2)+3) && $this->page <= $this->total_pages-($index+3) ) {
+				$output[]   = '<li><a href="' .$url . $separator. 'page=' .($this->total_pages-2). '">' .($this->total_pages-2). '</a></li>';
 				$output[]   = '<li><a href="' .$url . $separator. 'page=' .($this->total_pages-1). '">' .($this->total_pages-1). '</a></li>';
 				$output[]   = '<li><a href="' .$url . $separator. 'page=' .$this->total_pages. '">' .$this->total_pages. '</a></li>';        
 			}
