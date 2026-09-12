@@ -19,8 +19,9 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$url = $pagination->stripPageNew($base);
 	$separator = (strstr($url, '?')) ? '&' : '?';
 	$last_page_url = htmlspecialchars($url . $separator. 'page=' .$total_pages, ENT_QUOTES, 'UTF-8');
-	$last_page_pattern = '#href="[^"]*(?:\?|(?:&|&amp;))page=' .preg_quote((string) $total_pages, '#'). '(?:"|(?:&|&amp;))#';
-	if (preg_match($last_page_pattern, $page_link)) {
+	$decoded_page_link = html_entity_decode(html_entity_decode($page_link, ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8');
+	$last_page_pattern = '#href="[^"]*(?:\?|&)page=' .preg_quote((string) $total_pages, '#'). '(?:"|&)#';
+	if (preg_match($last_page_pattern, $decoded_page_link)) {
 		return $page_link;
 	}
 
