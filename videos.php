@@ -32,7 +32,7 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 		return substr($page_link, 0, $insert_position) .$last_page_item. substr($page_link, $insert_position);
 	}
 
-	return $page_link .$last_page_item;
+	return $page_link;
 }
 
 $slug = get_request_arg('videos', 'STRING');
