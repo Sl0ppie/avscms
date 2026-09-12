@@ -7,56 +7,68 @@ require 'classes/pagination.class.php';
 
 function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 {
+	$page_link = $pagination->getPagination($base, NULL, $index);
 	$total_pages = $pagination->getTotalPages();
 	$current_page = $pagination->getPage();
+	$trailing_threshold = $total_pages-($index+3);
 
-	if ($total_pages <= 1) {
-		return;
+	if (!$page_link || $total_pages <= (($index*2)+3) || $current_page > $trailing_threshold) {
+		return $page_link;
+	}
+
+	if (strpos($page_link, 'page=' .$total_pages. '"') !== false || !class_exists('DOMDocument')) {
+		return $page_link;
 	}
 
 	$url = $pagination->stripPageNew($base);
 	$separator = (strstr($url, '?')) ? '&' : '?';
-	$output = array();
-	$prev_page = ( $current_page > 1 ) ? $current_page - 1 : 1;
-	$next_page = $current_page + 1;
-	$trailing_threshold = $total_pages-($index+3);
+	$parser_input = str_replace('<span>&nbsp;...&nbsp;</span><li>', '<span>&nbsp;...&nbsp;</span></li>', $page_link);
+	$document = new DOMDocument('1.0', 'UTF-8');
+	$internal_errors = libxml_use_internal_errors(true);
+	$loaded = $document->loadHTML('<?xml encoding="UTF-8"><ul>' .$parser_input. '</ul>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+	libxml_clear_errors();
+	libxml_use_internal_errors($internal_errors);
 
-	if ( $current_page != 1 ) {
-		$output[] = '<li class="page-item"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$prev_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($prev_page, 'prev_page'). '><i class="fas fa-caret-left"></i></a></li>';
+	if (!$loaded) {
+		return $page_link;
 	}
 
-	if ( $total_pages > (($index*2)+3) && $current_page >= ($index+3) ) {
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=1', ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(1). '>1</a></li>';
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=2', ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(2). '>2</a></li>';
+	$list = $document->getElementsByTagName('ul')->item(0);
+	if (!$list) {
+		return $page_link;
 	}
 
-	if ( $current_page > $index+3 ) {
-		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
-	}
+	$list_item = $document->createElement('li');
+	$list_item->setAttribute('class', 'page-item d-none d-md-inline');
+	$link = $document->createElement('a', $total_pages);
+	$link->setAttribute('class', 'page-link');
+	$link->setAttribute('href', $url . $separator. 'page=' .$total_pages);
+	$list_item->appendChild($link);
 
-	for ( $i=1; $i<=$total_pages; $i++ ) {
-		if ( $current_page == $i ) {
-			$output[] = '<li class="page-item active" aria-current="page"><span class="page-link">' .$current_page. '</span></li>';
-		} elseif ( ($i >= ($current_page-$index) && $i < $current_page) or ($i <= ($current_page+$index) && $i > $current_page) ) {
-			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator . 'page=' .$i, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($i). '>' .$i. '</a></li>';
+	$next_item = NULL;
+	foreach ($list->childNodes as $child) {
+		if ($child->nodeName == 'li') {
+			foreach ($child->getElementsByTagName('i') as $icon) {
+				if (strpos($icon->getAttribute('class'), 'fa-caret-right') !== false) {
+					$next_item = $child;
+					break 2;
+				}
+			}
 		}
 	}
 
-	if ( $current_page < $trailing_threshold ) {
-		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
+	if ($next_item) {
+		$list->insertBefore($list_item, $next_item);
+	} else {
+		$list->appendChild($list_item);
 	}
 
-	if ( $total_pages > (($index*2)+3) && $current_page <= $trailing_threshold ) {
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .($total_pages-2), ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(($total_pages-2)). '>' .($total_pages-2). '</a></li>';
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .($total_pages-1), ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(($total_pages-1)). '>' .($total_pages-1). '</a></li>';
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$total_pages, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($total_pages). '>' .$total_pages. '</a></li>';
+	$output = '';
+	foreach ($list->childNodes as $child) {
+		$output .= $document->saveHTML($child);
 	}
 
-	if ( $current_page != $total_pages ) {
-		$output[] = '<li class="page-item"><a class="page-link prevnext" href="' .htmlspecialchars($url . $separator. 'page=' .$next_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($next_page, 'next_page'). '><i class="fas fa-caret-right"></i></a></li>';
-	}
-
-	return implode('', $output);
+	return $output;
 }
 
 $slug = get_request_arg('videos', 'STRING');
