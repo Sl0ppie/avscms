@@ -149,7 +149,16 @@ if( !$cat_endpoint ) {
 	$start_num      = $pagination->getStartItem();
 	$end_num        = $pagination->getEndItem();
 } else {
-	$endpoint_query = http_build_query($_GET);
+	$endpoint_params = array();
+	$endpoint_allowed_params = array('page', 'type', 'q', 'o', 't');
+
+	foreach ($endpoint_allowed_params as $param) {
+		if (isset($_GET[$param])) {
+			$endpoint_params[$param] = $_GET[$param];
+		}
+	}
+
+	$endpoint_query = http_build_query($endpoint_params);
 	$endpoint_url = $cat_endpoint;
 
 	if ($endpoint_query !== '') {
@@ -183,7 +192,8 @@ if( !$cat_endpoint ) {
 		$current_page = (int) floor(((int)$response['pagination']['offset']) / $page_items) + 1;
 	}
 
-	$pagination     = new Pagination($page_items, (int)$current_page);
+	$pagination     = new Pagination($config['videos_per_page'], (int)$current_page);
+	$pagination->page_items = $page_items;
 	$pagination->getLimit($total);
 
 	$start_num      = (isset($response['pagination']['start_item']))
