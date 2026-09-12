@@ -24,8 +24,15 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$separator = (strstr($url, '?')) ? '&' : '?';
 	$parser_input = str_replace('<span>&nbsp;...&nbsp;</span><li>', '<span>&nbsp;...&nbsp;</span></li>', $page_link);
 	$document = new DOMDocument('1.0', 'UTF-8');
+	$options = 0;
 	$internal_errors = libxml_use_internal_errors(true);
-	$loaded = $document->loadHTML('<?xml encoding="UTF-8"><ul>' .$parser_input. '</ul>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+	if (defined('LIBXML_HTML_NOIMPLIED')) {
+		$options |= LIBXML_HTML_NOIMPLIED;
+	}
+	if (defined('LIBXML_HTML_NODEFDTD')) {
+		$options |= LIBXML_HTML_NODEFDTD;
+	}
+	$loaded = $document->loadHTML('<?xml encoding="UTF-8"><ul>' .$parser_input. '</ul>', $options);
 	libxml_clear_errors();
 	libxml_use_internal_errors($internal_errors);
 
