@@ -5,27 +5,57 @@ require 'include/function_global.php';
 require 'include/function_smarty.php';
 require 'classes/pagination.class.php';
 
-function videos_endpoint_pagination_link($pagination, $base, $page_link)
+function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 {
 	$total_pages = $pagination->getTotalPages();
 	$current_page = $pagination->getPage();
 
-	if (!$page_link || $total_pages <= 9 || $current_page > ($total_pages - 6)) {
-		return $page_link;
+	if ($total_pages <= 1) {
+		return;
 	}
 
 	$url = htmlspecialchars($pagination->stripPageNew($base), ENT_QUOTES, 'UTF-8');
 	$separator = (strstr($url, '?')) ? '&' : '?';
-	$last_page = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .$total_pages. '">' .$total_pages. '</a></li>';
+	$output = array();
+	$prev_page = ( $current_page > 1 ) ? $current_page - 1 : 1;
+	$next_page = $current_page + 1;
 
-	if (strpos($page_link, 'page=' .$total_pages. '"') !== false) {
-		return $page_link;
+	if ( $current_page != 1 ) {
+		$output[] = '<li class="page-item"><a class="page-link" href="' .$url . $separator. 'page=' .$prev_page. '"' .$pagination->getID($prev_page, 'prev_page'). '><i class="fas fa-caret-left"></i></a></li>';
 	}
 
-	$pattern = '#(<li class="page-item d-none d-md-inline"><a class="page-link" href="[^"]*page=' .($total_pages-1). '"[^>]*>' .($total_pages-1). '</a></li>)#';
-	$page_link_fixed = preg_replace($pattern, '$1' .$last_page, $page_link, 1);
+	if ( $total_pages > (($index*2)+3) && $current_page >= ($index+3) ) {
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=1"' .$pagination->getID(1). '>1</a></li>';
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=2"' .$pagination->getID(2). '>2</a></li>';
+	}
 
-	return ($page_link_fixed != $page_link) ? $page_link_fixed : $page_link;
+	if ( $current_page > $index+3 ) {
+		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span><li>';
+	}
+
+	for ( $i=1; $i<=$total_pages; $i++ ) {
+		if ( $current_page == $i ) {
+			$output[] = '<li class="page-item active"><a class="page-link" href="javascript:void(0)">' .$current_page. '</a></li>';
+		} elseif ( ($i >= ($current_page-$index) && $i < $current_page) or ($i <= ($current_page+$index) && $i > $current_page) ) {
+			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator . 'page=' .$i. '"' .$pagination->getID($i). '>' .$i. '</a></li>';
+		}
+	}
+
+	if ( $current_page < ($total_pages-6) ) {
+		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span><li>';
+	}
+
+	if ( $total_pages > (($index*2)+3) && $current_page <= $total_pages-($index+3) ) {
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .($total_pages-2). '"' .$pagination->getID(($total_pages-2)). '>' .($total_pages-2). '</a></li>';
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .($total_pages-1). '"' .$pagination->getID(($total_pages-1)). '>' .($total_pages-1). '</a></li>';
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .$total_pages. '"' .$pagination->getID($total_pages). '>' .$total_pages. '</a></li>';
+	}
+
+	if ( $current_page != $total_pages ) {
+		$output[] = '<li class="page-item"><a class="page-link" href="' .$url . $separator. 'page=' .$next_page. '"' .$pagination->getID($next_page, 'next_page'). ' class="prevnext"><i class="fas fa-caret-right"></i></a></li>';
+	}
+
+	return implode('', $output);
 }
 
 $slug = get_request_arg('videos', 'STRING');
@@ -225,8 +255,7 @@ if( !$cat_endpoint ) {
 		? (int)$response['pagination']['end_item']
 		: $pagination->getEndItem();
 
-	$page_link = $pagination->getPagination('videos/'.$slug);
-	$page_link = videos_endpoint_pagination_link($pagination, 'videos/'.$slug, $page_link);
+	$page_link = videos_endpoint_pagination_link($pagination, 'videos/'.$slug);
 	$smarty->assign('base', 'videos/'.$slug);
 }
 
