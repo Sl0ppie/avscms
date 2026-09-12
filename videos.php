@@ -5,6 +5,29 @@ require 'include/function_global.php';
 require 'include/function_smarty.php';
 require 'classes/pagination.class.php';
 
+function videos_endpoint_pagination_link($pagination, $base, $page_link)
+{
+	$total_pages = $pagination->getTotalPages();
+	$current_page = $pagination->getPage();
+
+	if (!$page_link || $total_pages <= 9 || $current_page > ($total_pages - 6)) {
+		return $page_link;
+	}
+
+	$url = htmlspecialchars($pagination->stripPageNew($base), ENT_QUOTES, 'UTF-8');
+	$separator = (strstr($url, '?')) ? '&' : '?';
+	$last_page = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .$total_pages. '">' .$total_pages. '</a></li>';
+
+	if (strpos($page_link, 'page=' .$total_pages. '"') !== false) {
+		return $page_link;
+	}
+
+	$pattern = '#(<li class="page-item d-none d-md-inline"><a class="page-link" href="[^"]*page=' .($total_pages-1). '"[^>]*>' .($total_pages-1). '</a></li>)#';
+	$page_link_fixed = preg_replace($pattern, '$1' .$last_page, $page_link, 1);
+
+	return ($page_link_fixed != $page_link) ? $page_link_fixed : $page_link;
+}
+
 $slug = get_request_arg('videos', 'STRING');
 if ($slug != '') {
 	$sql            = "SELECT * FROM channel WHERE slug = '".$slug."' LIMIT 1";
@@ -203,6 +226,7 @@ if( !$cat_endpoint ) {
 		: $pagination->getEndItem();
 
 	$page_link = $pagination->getPagination('videos/'.$slug);
+	$page_link = videos_endpoint_pagination_link($pagination, 'videos/'.$slug, $page_link);
 	$smarty->assign('base', 'videos/'.$slug);
 }
 
