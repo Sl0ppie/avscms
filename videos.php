@@ -186,8 +186,12 @@ if( !$cat_endpoint ) {
 	$pagination     = new Pagination($page_items, (int)$current_page);
 	$limit          = $pagination->getLimit($total);
 
-	$start_num      = $pagination->getStartItem();
-	$end_num	= $pagination->getEndItem();
+	$start_num      = (isset($response['pagination']['start_item']))
+		? (int)$response['pagination']['start_item']
+		: $pagination->getStartItem();
+	$end_num	= (isset($response['pagination']['end_item']))
+		? (int)$response['pagination']['end_item']
+		: $pagination->getEndItem();
 
 	$page_link = $pagination->getPagination('videos/'.$slug);
 	$smarty->assign('base', 'videos/'.$slug);
