@@ -52,7 +52,7 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	}
 
 	if ( $current_page != $total_pages ) {
-		$output[] = '<li class="page-item"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$next_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($next_page, 'next_page'). ' class="prevnext"><i class="fas fa-caret-right"></i></a></li>';
+		$output[] = '<li class="page-item"><a class="page-link prevnext" href="' .htmlspecialchars($url . $separator. 'page=' .$next_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($next_page, 'next_page'). '><i class="fas fa-caret-right"></i></a></li>';
 	}
 
 	return implode('', $output);
