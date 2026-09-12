@@ -34,9 +34,11 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	}
 
 	$last_page_item = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$last_page_url. '">' .$total_pages. '</a></li>';
-	$last_item_position = strrpos($page_link, '<li');
-	if ($last_item_position !== false) {
-		return substr($page_link, 0, $last_item_position) .$last_page_item. substr($page_link, $last_item_position);
+	$penultimate_page_url = htmlspecialchars($url . $separator. 'page=' .($total_pages-1), ENT_QUOTES, 'UTF-8');
+	$penultimate_pattern = '#<li\b[^>]*>\s*<a\b[^>]*href="' .preg_quote($penultimate_page_url, '#'). '"[^>]*>.*?</a>\s*</li>#s';
+	if (preg_match($penultimate_pattern, $page_link, $matches, PREG_OFFSET_CAPTURE)) {
+		$insert_position = $matches[0][1] + strlen($matches[0][0]);
+		return substr($page_link, 0, $insert_position) .$last_page_item. substr($page_link, $insert_position);
 	}
 
 	return $page_link .$last_page_item;
