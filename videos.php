@@ -19,19 +19,15 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$url = $pagination->stripPageNew($base);
 	$separator = (strstr($url, '?')) ? '&' : '?';
 	$last_page_url = $url . $separator. 'page=' .$total_pages;
-	if (strpos($page_link, htmlspecialchars($last_page_url, ENT_QUOTES, 'UTF-8')) !== false || !class_exists('DOMDocument')) {
+	if (!class_exists('DOMDocument')) {
 		return $page_link;
 	}
 
 	$parser_input = str_replace('<span>&nbsp;...&nbsp;</span><li>', '<span>&nbsp;...&nbsp;</span></li>', $page_link);
 	$document = new DOMDocument('1.0', 'UTF-8');
 	$options = 0;
-	$entity_loader = NULL;
 	$internal_errors = libxml_use_internal_errors(true);
 	try {
-		if (function_exists('libxml_disable_entity_loader')) {
-			$entity_loader = libxml_disable_entity_loader(true);
-		}
 		if (defined('LIBXML_HTML_NOIMPLIED')) {
 			$options |= LIBXML_HTML_NOIMPLIED;
 		}
@@ -44,9 +40,6 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 		$loaded = $document->loadHTML('<?xml encoding="UTF-8"><ul>' .$parser_input. '</ul>', $options);
 	} finally {
 		libxml_clear_errors();
-		if ($entity_loader !== NULL) {
-			libxml_disable_entity_loader($entity_loader);
-		}
 		libxml_use_internal_errors($internal_errors);
 	}
 
@@ -57,6 +50,12 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$list = $document->getElementsByTagName('ul')->item(0);
 	if (!$list) {
 		return $page_link;
+	}
+
+	foreach ($list->getElementsByTagName('a') as $link) {
+		if ($link->getAttribute('href') == $last_page_url) {
+			return $page_link;
+		}
 	}
 
 	$list_item = $document->createElement('li');
