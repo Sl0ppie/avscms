@@ -40,10 +40,18 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 		}
 	}
 
-	$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
 	$last_rendered_page = $current_page + $index;
+	$tail_pages = array();
 	foreach (array($total_pages-2, $total_pages-1, $total_pages) as $tail_page) {
 		if ($tail_page > $last_rendered_page) {
+			$tail_pages[] = $tail_page;
+		}
+	}
+	if ($tail_pages) {
+		if ($tail_pages[0] > ($last_rendered_page+1)) {
+			$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
+		}
+		foreach ($tail_pages as $tail_page) {
 			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .$tail_page. '"' .$pagination->getID($tail_page). '>' .$tail_page. '</a></li>';
 		}
 	}
