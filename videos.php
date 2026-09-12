@@ -20,24 +20,16 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$separator = (strstr($url, '?')) ? '&' : '?';
 	$last_page_href = $url . $separator. 'page=' .$total_pages;
 	$last_page_url = htmlspecialchars($last_page_href, ENT_QUOTES, 'UTF-8');
-	$decoded_page_link = $page_link;
-	do {
-		$normalized_page_link = html_entity_decode($decoded_page_link, ENT_QUOTES, 'UTF-8');
-		if ($normalized_page_link === $decoded_page_link) {
-			break;
-		}
-		$decoded_page_link = $normalized_page_link;
-	} while (strpos($decoded_page_link, '&') !== false);
-	$normalized_last_page_url = html_entity_decode($last_page_url, ENT_QUOTES, 'UTF-8');
-	if (strpos($page_link, 'href="' .$last_page_url. '"') !== false || strpos($decoded_page_link, 'href="' .$normalized_last_page_url. '"') !== false) {
+	$normalized_page_link = html_entity_decode($page_link, ENT_QUOTES, 'UTF-8');
+	if (strpos($page_link, 'href="' .$last_page_url. '"') !== false || strpos($normalized_page_link, 'href="' .$last_page_href. '"') !== false) {
 		return $page_link;
 	}
 
 	$last_page_item = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$last_page_url. '">' .$total_pages. '</a></li>';
-	$penultimate_page_url = htmlspecialchars($url . $separator. 'page=' .($total_pages-1), ENT_QUOTES, 'UTF-8');
-	$penultimate_pattern = '#<li\b[^>]*>\s*<a\b[^>]*href="' .preg_quote($penultimate_page_url, '#'). '"[^>]*>.*?</a>\s*</li>#s';
-	if (preg_match($penultimate_pattern, $page_link, $matches, PREG_OFFSET_CAPTURE)) {
-		$insert_position = $matches[0][1] + strlen($matches[0][0]);
+	$penultimate_marker = '>' .($total_pages-1). '</a></li>';
+	$insert_position = strpos($page_link, $penultimate_marker);
+	if ($insert_position !== false) {
+		$insert_position += strlen($penultimate_marker);
 		return substr($page_link, 0, $insert_position) .$last_page_item. substr($page_link, $insert_position);
 	}
 
