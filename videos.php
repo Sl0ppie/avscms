@@ -14,45 +14,45 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 		return;
 	}
 
-	$url = htmlspecialchars($pagination->stripPageNew($base), ENT_QUOTES, 'UTF-8');
+	$url = $pagination->stripPageNew($base);
 	$separator = (strstr($url, '?')) ? '&' : '?';
 	$output = array();
 	$prev_page = ( $current_page > 1 ) ? $current_page - 1 : 1;
 	$next_page = $current_page + 1;
 
 	if ( $current_page != 1 ) {
-		$output[] = '<li class="page-item"><a class="page-link" href="' .$url . $separator. 'page=' .$prev_page. '"' .$pagination->getID($prev_page, 'prev_page'). '><i class="fas fa-caret-left"></i></a></li>';
+		$output[] = '<li class="page-item"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$prev_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($prev_page, 'prev_page'). '><i class="fas fa-caret-left"></i></a></li>';
 	}
 
 	if ( $total_pages > (($index*2)+3) && $current_page >= ($index+3) ) {
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=1"' .$pagination->getID(1). '>1</a></li>';
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=2"' .$pagination->getID(2). '>2</a></li>';
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=1', ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(1). '>1</a></li>';
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=2', ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(2). '>2</a></li>';
 	}
 
 	if ( $current_page > $index+3 ) {
-		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span><li>';
+		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
 	}
 
 	for ( $i=1; $i<=$total_pages; $i++ ) {
 		if ( $current_page == $i ) {
 			$output[] = '<li class="page-item active"><a class="page-link" href="javascript:void(0)">' .$current_page. '</a></li>';
 		} elseif ( ($i >= ($current_page-$index) && $i < $current_page) or ($i <= ($current_page+$index) && $i > $current_page) ) {
-			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator . 'page=' .$i. '"' .$pagination->getID($i). '>' .$i. '</a></li>';
+			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator . 'page=' .$i, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($i). '>' .$i. '</a></li>';
 		}
 	}
 
 	if ( $current_page < ($total_pages-6) ) {
-		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span><li>';
+		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
 	}
 
 	if ( $total_pages > (($index*2)+3) && $current_page <= $total_pages-($index+3) ) {
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .($total_pages-2). '"' .$pagination->getID(($total_pages-2)). '>' .($total_pages-2). '</a></li>';
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .($total_pages-1). '"' .$pagination->getID(($total_pages-1)). '>' .($total_pages-1). '</a></li>';
-		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .$total_pages. '"' .$pagination->getID($total_pages). '>' .$total_pages. '</a></li>';
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .($total_pages-2), ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(($total_pages-2)). '>' .($total_pages-2). '</a></li>';
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .($total_pages-1), ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(($total_pages-1)). '>' .($total_pages-1). '</a></li>';
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$total_pages, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($total_pages). '>' .$total_pages. '</a></li>';
 	}
 
 	if ( $current_page != $total_pages ) {
-		$output[] = '<li class="page-item"><a class="page-link" href="' .$url . $separator. 'page=' .$next_page. '"' .$pagination->getID($next_page, 'next_page'). ' class="prevnext"><i class="fas fa-caret-right"></i></a></li>';
+		$output[] = '<li class="page-item"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$next_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($next_page, 'next_page'). ' class="prevnext"><i class="fas fa-caret-right"></i></a></li>';
 	}
 
 	return implode('', $output);
