@@ -28,13 +28,12 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 		}
 		$decoded_page_link = $normalized_page_link;
 	} while (strpos($decoded_page_link, '&') !== false);
-	if (preg_match('#href="' .preg_quote($last_page_href, '#'). '"#', $decoded_page_link)) {
+	if (strpos($page_link, 'href="' .$last_page_url. '"') !== false || preg_match('#href="' .preg_quote($last_page_href, '#'). '"#', $decoded_page_link)) {
 		return $page_link;
 	}
 
 	$last_page_item = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$last_page_url. '">' .$total_pages. '</a></li>';
-	$next_page_url = htmlspecialchars($url . $separator. 'page=' .($current_page+1), ENT_QUOTES, 'UTF-8');
-	if (preg_match('#<li\b[^>]*>\s*<a\b[^>]*href="' .preg_quote($next_page_url, '#'). '"[^>]*>#', $page_link, $matches, PREG_OFFSET_CAPTURE)) {
+	if (preg_match('#<li\b[^>]*>\s*<a\b[^>]*>\s*<i\b[^>]*class="[^"]*fa-caret-right[^"]*"[^>]*></i>\s*</a>\s*</li>#', $page_link, $matches, PREG_OFFSET_CAPTURE)) {
 		$next_page_position = $matches[0][1];
 		return substr($page_link, 0, $next_page_position) .$last_page_item. substr($page_link, $next_page_position);
 	}
