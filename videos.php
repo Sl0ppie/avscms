@@ -192,8 +192,7 @@ if( !$cat_endpoint ) {
 		$current_page = (int) floor(((int)$response['pagination']['offset']) / $page_items) + 1;
 	}
 
-	$pagination     = new Pagination($config['videos_per_page'], (int)$current_page);
-	$pagination->page_items = $page_items;
+	$pagination     = new Pagination($page_items, (int)$current_page);
 	$pagination->getLimit($total);
 
 	$start_num      = (isset($response['pagination']['start_item']))
