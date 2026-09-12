@@ -184,7 +184,7 @@ if( !$cat_endpoint ) {
 	}
 
 	$pagination     = new Pagination($page_items, (int)$current_page);
-	$limit          = $pagination->getLimit($total);
+	$pagination->getLimit($total);
 
 	$start_num      = (isset($response['pagination']['start_item']))
 		? (int)$response['pagination']['start_item']
