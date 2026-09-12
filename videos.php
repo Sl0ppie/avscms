@@ -19,7 +19,7 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$url = $pagination->stripPageNew($base);
 	$separator = (strstr($url, '?')) ? '&' : '?';
 	$last_page_url = $url . $separator. 'page=' .$total_pages;
-	if (!class_exists('DOMDocument')) {
+	if (!class_exists('DOMDocument') || !defined('LIBXML_NONET')) {
 		return $page_link;
 	}
 
@@ -34,9 +34,7 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 		if (defined('LIBXML_HTML_NODEFDTD')) {
 			$options |= LIBXML_HTML_NODEFDTD;
 		}
-		if (defined('LIBXML_NONET')) {
-			$options |= LIBXML_NONET;
-		}
+		$options |= LIBXML_NONET;
 		$loaded = $document->loadHTML('<?xml encoding="UTF-8"><div id="pagination-root">' .$parser_input. '</div>', $options);
 	} finally {
 		libxml_clear_errors();
