@@ -180,7 +180,7 @@ if( !$cat_endpoint ) {
 	} elseif (isset($response['pagination']['page']) && (int)$response['pagination']['page'] > 0) {
 		$current_page = (int)$response['pagination']['page'];
 	} elseif (isset($response['pagination']['offset']) && $page_items > 0) {
-		$current_page = ((int)$response['pagination']['offset'] / $page_items) + 1;
+		$current_page = (int) floor(((int)$response['pagination']['offset']) / $page_items) + 1;
 	}
 
 	$pagination     = new Pagination($page_items, (int)$current_page);
