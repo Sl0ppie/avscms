@@ -47,7 +47,7 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 		return $page_link;
 	}
 
-	$container = $document->documentElement;
+	$container = $document->getElementsByTagName('div')->item(0);
 	if (!$container) {
 		return $page_link;
 	}
