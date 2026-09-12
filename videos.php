@@ -41,9 +41,12 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	}
 
 	$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
-	$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .($total_pages-2). '"' .$pagination->getID(($total_pages-2)). '>' .($total_pages-2). '</a></li>';
-	$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .($total_pages-1). '"' .$pagination->getID(($total_pages-1)). '>' .($total_pages-1). '</a></li>';
-	$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .$total_pages. '"' .$pagination->getID($total_pages). '>' .$total_pages. '</a></li>';
+	$last_rendered_page = $current_page + $index;
+	foreach (array($total_pages-2, $total_pages-1, $total_pages) as $tail_page) {
+		if ($tail_page > $last_rendered_page) {
+			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$url . $separator. 'page=' .$tail_page. '"' .$pagination->getID($tail_page). '>' .$tail_page. '</a></li>';
+		}
+	}
 
 	if ( $current_page != $total_pages ) {
 		$output[] = '<li class="page-item"><a class="page-link prevnext" href="' .$url . $separator. 'page=' .$next_page. '"' .$pagination->getID($next_page, 'next_page'). '><i class="fas fa-caret-right"></i></a></li>';
