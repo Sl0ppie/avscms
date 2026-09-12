@@ -137,29 +137,60 @@ if( !$cat_endpoint ) {
 	$sql            = "SELECT * FROM video" .$sql_add. " LIMIT " .$limit;
 	$rs             = $conn->execute($sql);
 	$videos         = $rs->getrows();
-} else {
 
+	if ($slug) {
+        	$page_link      = $pagination->getPagination('videos/'.$slug);
+        	$smarty->assign('base', 'videos/'.$slug);
+	} else {
+        	$page_link      = $pagination->getPagination('videos');
+        	$smarty->assign('base', 'videos');
+	}
+
+	$start_num      = $pagination->getStartItem();
+	$end_num        = $pagination->getEndItem();
+} else {
+	$ch = curl_init( $cat_endpoint );
+	curl_setopt($ch, CURLOPT_HTTPHEADER, [ 'Accept: application/json' ]);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$response = curl_exec($ch);
+	$response = json_decode( $response, true );
+	foreach( $response['videos'] as &$v ) {
+		$v['VID'] = (int)$v['VID'] + 400000;
+	}
+	$videos = $response['videos'];
+	//die(var_export($response, true));
+
+	$total = $response['pagination']['total_items'];
+	$limit = $response['pagination']['limit'];
+
+	$pagination     = new Pagination( $config['videos_per_page'] );
+
+	$start_num      = 1;
+  $end_num	= 24;
+
+	$page_link = $pagination->getPagination('videos/'.$slug);
+	$smarty->assign('base', 'videos/'.$slug);
 }
 
 $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '';
 if( str_contains($acceptHeader, 'application/json') ) {
 	$pageData = (object) [];
 	$pageData->pagination = $pagination;
-	$pageData->videos = $videos;
+	$pageData->videos = (array)$videos;
 	echo json_encode( $pageData );
 	exit();
 }
 
-if ($slug) {
-	$page_link      = $pagination->getPagination('videos/'.$slug);	
-	$smarty->assign('base', 'videos/'.$slug);
-} else {
-	$page_link      = $pagination->getPagination('videos');
-	$smarty->assign('base', 'videos');	
-}
+//if ($slug) {
+//	$page_link      = $pagination->getPagination('videos/'.$slug);	
+//	$smarty->assign('base', 'videos/'.$slug);
+//} else {
+//	$page_link      = $pagination->getPagination('videos');
+//	$smarty->assign('base', 'videos');
+//}
 
-$start_num      = $pagination->getStartItem();
-$end_num        = $pagination->getEndItem();
+//$start_num      = $pagination->getStartItem();
+//$end_num        = $pagination->getEndItem();
 
 $title              = $title_t . $title_o . $title_c . $title_p;
 $self_title         = $title . $seo['videos_title'];

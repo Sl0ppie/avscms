@@ -692,6 +692,7 @@ a.show-hide i {
 .thumb-overlay {
     position: relative;
 	overflow: hidden;
+	max-height: 120px;
 }
 
 .img-responsive {

@@ -17,6 +17,20 @@ if ( !$vid ) {
     VRedirect::go($config['BASE_URL']. '/notfound/video_missing');
 }
 
+
+if( $vid >= 400000 ) {
+	$vid = $vid - 400000;
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, "https://animalpornrocks.com/video/".$vid.'/');
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$response = curl_exec($ch);
+  echo $response;
+	exit();
+}
+
+
+
+
 $active     = ( $config['approve'] == '1' ) ? " AND v.active = '1'" : NULL;
 $sql        = "SELECT v.*, u.username, u.photo, u.gender, u.fname
                FROM video AS v, signup AS u WHERE v.VID = " .$vid. " AND v.UID = u.UID" .$active. " LIMIT 1";
