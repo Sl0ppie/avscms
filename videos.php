@@ -149,24 +149,58 @@ if( !$cat_endpoint ) {
 	$start_num      = $pagination->getStartItem();
 	$end_num        = $pagination->getEndItem();
 } else {
-	$ch = curl_init( $cat_endpoint );
+	$endpoint_params = array();
+	$endpoint_allowed_params = array('page', 'type', 'q', 'o', 't');
+
+	foreach ($endpoint_allowed_params as $param) {
+		if (isset($_GET[$param])) {
+			$endpoint_params[$param] = $_GET[$param];
+		}
+	}
+
+	$endpoint_query = http_build_query($endpoint_params);
+	$endpoint_url = $cat_endpoint;
+
+	if ($endpoint_query !== '') {
+		$endpoint_url .= (str_contains($cat_endpoint, '?')) ? '&' : '?';
+		$endpoint_url .= $endpoint_query;
+	}
+
+	$ch = curl_init( $endpoint_url );
 	curl_setopt($ch, CURLOPT_HTTPHEADER, [ 'Accept: application/json' ]);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	$response = curl_exec($ch);
+	curl_close($ch);
 	$response = json_decode( $response, true );
-	foreach( $response['videos'] as &$v ) {
+	$videos = (isset($response['videos']) && is_array($response['videos'])) ? $response['videos'] : array();
+
+	foreach( $videos as &$v ) {
 		$v['VID'] = (int)$v['VID'] + 400000;
 	}
-	$videos = $response['videos'];
-	//die(var_export($response, true));
 
-	$total = $response['pagination']['total_items'];
-	$limit = $response['pagination']['limit'];
+	$total = (isset($response['pagination']['total_items'])) ? (int)$response['pagination']['total_items'] : count($videos);
+	$page_items = (isset($response['pagination']['limit']) && (int)$response['pagination']['limit'] > 0)
+		? (int)$response['pagination']['limit']
+		: (int)$config['videos_per_page'];
+	$current_page = 1;
 
-	$pagination     = new Pagination( $config['videos_per_page'] );
+	if (isset($response['pagination']['current_page']) && (int)$response['pagination']['current_page'] > 0) {
+		$current_page = (int)$response['pagination']['current_page'];
+	} elseif (isset($response['pagination']['page']) && (int)$response['pagination']['page'] > 0) {
+		$current_page = (int)$response['pagination']['page'];
+	} elseif (isset($response['pagination']['offset']) && $page_items > 0) {
+		$current_page = (int) floor(((int)$response['pagination']['offset']) / $page_items) + 1;
+	}
 
-	$start_num      = 1;
-  $end_num	= 24;
+	$pagination     = new Pagination($page_items, (int)$current_page);
+	$pagination->getLimit($total);
+
+	$start_num      = (isset($response['pagination']['start_item']))
+		? (int)$response['pagination']['start_item']
+		: $pagination->getStartItem();
+	$end_num	= (isset($response['pagination']['end_item']))
+		? (int)$response['pagination']['end_item']
+		: $pagination->getEndItem();
 
 	$page_link = $pagination->getPagination('videos/'.$slug);
 	$smarty->assign('base', 'videos/'.$slug);
