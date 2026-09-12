@@ -21,9 +21,13 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$last_page_href = $url . $separator. 'page=' .$total_pages;
 	$last_page_url = htmlspecialchars($last_page_href, ENT_QUOTES, 'UTF-8');
 	$decoded_page_link = $page_link;
-	for ($i = 0; $i < 3; $i++) {
-		$decoded_page_link = html_entity_decode($decoded_page_link, ENT_QUOTES, 'UTF-8');
-	}
+	do {
+		$normalized_page_link = html_entity_decode($decoded_page_link, ENT_QUOTES, 'UTF-8');
+		if ($normalized_page_link === $decoded_page_link) {
+			break;
+		}
+		$decoded_page_link = $normalized_page_link;
+	} while (strpos($decoded_page_link, '&') !== false);
 	if (preg_match('#href="' .preg_quote($last_page_href, '#'). '"#', $decoded_page_link)) {
 		return $page_link;
 	}
