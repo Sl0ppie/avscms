@@ -19,6 +19,7 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$output = array();
 	$prev_page = ( $current_page > 1 ) ? $current_page - 1 : 1;
 	$next_page = $current_page + 1;
+	$trailing_threshold = $total_pages-($index+3);
 
 	if ( $current_page != 1 ) {
 		$output[] = '<li class="page-item"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$prev_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($prev_page, 'prev_page'). '><i class="fas fa-caret-left"></i></a></li>';
@@ -35,17 +36,17 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 
 	for ( $i=1; $i<=$total_pages; $i++ ) {
 		if ( $current_page == $i ) {
-			$output[] = '<li class="page-item active"><a class="page-link" href="javascript:void(0)">' .$current_page. '</a></li>';
+			$output[] = '<li class="page-item active" aria-current="page"><span class="page-link">' .$current_page. '</span></li>';
 		} elseif ( ($i >= ($current_page-$index) && $i < $current_page) or ($i <= ($current_page+$index) && $i > $current_page) ) {
 			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator . 'page=' .$i, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($i). '>' .$i. '</a></li>';
 		}
 	}
 
-	if ( $current_page < ($total_pages-6) ) {
+	if ( $current_page < $trailing_threshold ) {
 		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
 	}
 
-	if ( $total_pages > (($index*2)+3) && $current_page <= $total_pages-($index+3) ) {
+	if ( $total_pages > (($index*2)+3) && $current_page <= $trailing_threshold ) {
 		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .($total_pages-2), ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(($total_pages-2)). '>' .($total_pages-2). '</a></li>';
 		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .($total_pages-1), ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(($total_pages-1)). '>' .($total_pages-1). '</a></li>';
 		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$total_pages, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($total_pages). '>' .$total_pages. '</a></li>';
