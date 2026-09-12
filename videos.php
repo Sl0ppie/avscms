@@ -18,75 +18,21 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 
 	$url = $pagination->stripPageNew($base);
 	$separator = (strstr($url, '?')) ? '&' : '?';
-	$last_page_url = $url . $separator. 'page=' .$total_pages;
-	if (!class_exists('DOMDocument') || !defined('LIBXML_NONET')) {
+	$last_page_url = htmlspecialchars($url . $separator. 'page=' .$total_pages, ENT_QUOTES, 'UTF-8');
+	if (strpos($page_link, 'href="' .$last_page_url. '"') !== false) {
 		return $page_link;
 	}
 
-	$parser_input = str_replace('<span>&nbsp;...&nbsp;</span><li>', '<span>&nbsp;...&nbsp;</span></li>', $page_link);
-	$document = new DOMDocument('1.0', 'UTF-8');
-	$options = 0;
-	$internal_errors = libxml_use_internal_errors(true);
-	try {
-		if (defined('LIBXML_HTML_NOIMPLIED')) {
-			$options |= LIBXML_HTML_NOIMPLIED;
-		}
-		if (defined('LIBXML_HTML_NODEFDTD')) {
-			$options |= LIBXML_HTML_NODEFDTD;
-		}
-		$options |= LIBXML_NONET;
-		$loaded = $document->loadHTML('<?xml encoding="UTF-8"><div id="pagination-root">' .$parser_input. '</div>', $options);
-	} finally {
-		libxml_clear_errors();
-		libxml_use_internal_errors($internal_errors);
+	$last_page_item = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .$last_page_url. '">' .$total_pages. '</a></li>';
+	$next_page_url = htmlspecialchars($url . $separator. 'page=' .($current_page+1), ENT_QUOTES, 'UTF-8');
+	$next_page_marker = '<li class="page-item"><a class="page-link" href="' .$next_page_url. '"';
+	$next_page_position = strpos($page_link, $next_page_marker);
+
+	if ($next_page_position === false) {
+		return $page_link .$last_page_item;
 	}
 
-	if (!$loaded) {
-		return $page_link;
-	}
-
-	$container = $document->getElementsByTagName('div')->item(0);
-	if (!$container) {
-		return $page_link;
-	}
-
-	foreach ($container->getElementsByTagName('a') as $link) {
-		if ($link->getAttribute('href') == $last_page_url) {
-			return $page_link;
-		}
-	}
-
-	$list_item = $document->createElement('li');
-	$list_item->setAttribute('class', 'page-item d-none d-md-inline');
-	$link = $document->createElement('a', $total_pages);
-	$link->setAttribute('class', 'page-link');
-	$link->setAttribute('href', $last_page_url);
-	$list_item->appendChild($link);
-
-	$next_item = NULL;
-	foreach ($container->childNodes as $child) {
-		if ($child->nodeName == 'li') {
-			foreach ($child->getElementsByTagName('i') as $icon) {
-				if (strpos($icon->getAttribute('class'), 'fa-caret-right') !== false) {
-					$next_item = $child;
-					break 2;
-				}
-			}
-		}
-	}
-
-	if ($next_item) {
-		$container->insertBefore($list_item, $next_item);
-	} else {
-		$container->appendChild($list_item);
-	}
-
-	$output = '';
-	foreach ($container->childNodes as $child) {
-		$output .= $document->saveHTML($child);
-	}
-
-	return $output;
+	return substr($page_link, 0, $next_page_position) .$last_page_item. substr($page_link, $next_page_position);
 }
 
 $slug = get_request_arg('videos', 'STRING');
