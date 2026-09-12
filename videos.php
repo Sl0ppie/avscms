@@ -20,8 +20,7 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$separator = (strstr($url, '?')) ? '&' : '?';
 	$last_page_href = $url . $separator. 'page=' .$total_pages;
 	$last_page_url = htmlspecialchars($last_page_href, ENT_QUOTES, 'UTF-8');
-	$normalized_page_link = html_entity_decode($page_link, ENT_QUOTES, 'UTF-8');
-	if (strpos($page_link, 'href="' .$last_page_url. '"') !== false || strpos($normalized_page_link, 'href="' .$last_page_href. '"') !== false) {
+	if (strpos($page_link, 'href="' .$last_page_url. '"') !== false) {
 		return $page_link;
 	}
 
