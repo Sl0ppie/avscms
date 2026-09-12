@@ -19,7 +19,8 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$url = $pagination->stripPageNew($base);
 	$separator = (strstr($url, '?')) ? '&' : '?';
 	$last_page_url = htmlspecialchars($url . $separator. 'page=' .$total_pages, ENT_QUOTES, 'UTF-8');
-	if (strpos($page_link, 'href="' .$last_page_url. '"') !== false) {
+	$last_page_pattern = '#href="[^"]*(?:\?|(?:&|&amp;))page=' .preg_quote((string) $total_pages, '#'). '(?:"|(?:&|&amp;))#';
+	if (preg_match($last_page_pattern, $page_link)) {
 		return $page_link;
 	}
 
@@ -28,11 +29,17 @@ function videos_endpoint_pagination_link($pagination, $base, $index = 3)
 	$next_page_marker = '<li class="page-item"><a class="page-link" href="' .$next_page_url. '"';
 	$next_page_position = strpos($page_link, $next_page_marker);
 
-	if ($next_page_position === false) {
+	if ($next_page_position !== false) {
+		return substr($page_link, 0, $next_page_position) .$last_page_item. substr($page_link, $next_page_position);
+	}
+
+	$last_item_position = strrpos($page_link, '</li>');
+	if ($last_item_position === false) {
 		return $page_link .$last_page_item;
 	}
 
-	return substr($page_link, 0, $next_page_position) .$last_page_item. substr($page_link, $next_page_position);
+	$last_item_position += 5;
+	return substr($page_link, 0, $last_item_position) .$last_page_item. substr($page_link, $last_item_position);
 }
 
 $slug = get_request_arg('videos', 'STRING');
