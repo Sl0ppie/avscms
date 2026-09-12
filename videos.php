@@ -173,8 +173,17 @@ if( !$cat_endpoint ) {
 	$page_items = (isset($response['pagination']['limit']) && (int)$response['pagination']['limit'] > 0)
 		? (int)$response['pagination']['limit']
 		: (int)$config['videos_per_page'];
+	$current_page = 1;
 
-	$pagination     = new Pagination($page_items);
+	if (isset($response['pagination']['current_page']) && (int)$response['pagination']['current_page'] > 0) {
+		$current_page = (int)$response['pagination']['current_page'];
+	} elseif (isset($response['pagination']['page']) && (int)$response['pagination']['page'] > 0) {
+		$current_page = (int)$response['pagination']['page'];
+	} elseif (isset($response['pagination']['offset']) && $page_items > 0) {
+		$current_page = ((int)$response['pagination']['offset'] / $page_items) + 1;
+	}
+
+	$pagination     = new Pagination($page_items, (int)$current_page);
 	$limit          = $pagination->getLimit($total);
 
 	$start_num      = $pagination->getStartItem();
