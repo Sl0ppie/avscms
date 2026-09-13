@@ -286,7 +286,8 @@ CREATE TABLE `channel` (
   `name` varchar(120) NOT NULL DEFAULT '',
   `slug` varchar(120) NOT NULL DEFAULT '',
   `total_videos` bigint(20) NOT NULL DEFAULT '0',
-  `registered_users_only` tinyint(1) NOT NULL DEFAULT '0'
+  `registered_users_only` tinyint(1) NOT NULL DEFAULT '0',
+  `endpoint` varchar(255) NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

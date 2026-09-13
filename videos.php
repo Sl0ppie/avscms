@@ -5,6 +5,66 @@ require 'include/function_global.php';
 require 'include/function_smarty.php';
 require 'classes/pagination.class.php';
 
+function videos_endpoint_pagination_link($pagination, $base, $index = 3)
+{
+	$total_pages = $pagination->getTotalPages();
+	$current_page = $pagination->getPage();
+	$trailing_threshold = $total_pages-($index+3);
+	$page_link = $pagination->getPagination($base, NULL, $index);
+
+	if (!$page_link || $total_pages <= (($index*2)+3) || $current_page > $trailing_threshold) {
+		return $page_link;
+	}
+
+	$url = $pagination->stripPageNew($base);
+	$separator = (strstr($url, '?')) ? '&' : '?';
+	$output = array();
+	$prev_page = ( $current_page > 1 ) ? $current_page - 1: 1;
+	$next_page = $current_page+1;
+	$window_start = ( $current_page > $index ) ? $current_page-$index : 1;
+	$window_end = ( ($current_page+$index) < $total_pages ) ? $current_page+$index : $total_pages;
+
+	if ( $current_page != 1 ) {
+		$output[] = '<li class="page-item"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$prev_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($prev_page, 'prev_page'). '><i class="fas fa-caret-left"></i></a></li>';
+	}
+	if ( $total_pages > (($index*2)+3) && $current_page >= ($index+3) ) {
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=1', ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(1). '>1</a></li>';
+		$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=2', ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID(2). '>2</a></li>';
+	}
+	if ( $current_page > $index+3 ) {
+		$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
+	}
+	for ( $i=$window_start; $i<=$window_end; $i++ ) {
+		if ( $current_page == $i ) {
+			$output[] = '<li class="page-item active" aria-current="page"><span class="page-link">' .$current_page. '</span></li>';
+		} else {
+			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator . 'page=' .$i, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($i). '>' .$i. '</a></li>';
+		}
+	}
+
+	$last_rendered_page = $window_end;
+	$tail_pages = array();
+	foreach (array($total_pages-2, $total_pages-1, $total_pages) as $tail_page) {
+		if ($tail_page > $last_rendered_page) {
+			$tail_pages[] = $tail_page;
+		}
+	}
+	if ($tail_pages) {
+		if ($tail_pages[0] > ($last_rendered_page+1)) {
+			$output[] = '<li class="page-item disabled d-none d-md-inline"><span>&nbsp;...&nbsp;</span></li>';
+		}
+		foreach ($tail_pages as $tail_page) {
+			$output[] = '<li class="page-item d-none d-md-inline"><a class="page-link" href="' .htmlspecialchars($url . $separator. 'page=' .$tail_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($tail_page). '>' .$tail_page. '</a></li>';
+		}
+	}
+
+	if ( $current_page != $total_pages ) {
+		$output[] = '<li class="page-item"><a class="page-link prevnext" href="' .htmlspecialchars($url . $separator. 'page=' .$next_page, ENT_QUOTES, 'UTF-8'). '"' .$pagination->getID($next_page, 'next_page'). '><i class="fas fa-caret-right"></i></a></li>';
+	}
+
+	return implode('', $output);
+}
+
 $slug = get_request_arg('videos', 'STRING');
 if ($slug != '') {
 	$sql            = "SELECT * FROM channel WHERE slug = '".$slug."' LIMIT 1";
@@ -137,29 +197,94 @@ if( !$cat_endpoint ) {
 	$sql            = "SELECT * FROM video" .$sql_add. " LIMIT " .$limit;
 	$rs             = $conn->execute($sql);
 	$videos         = $rs->getrows();
-} else {
 
+	if ($slug) {
+        	$page_link      = $pagination->getPagination('videos/'.$slug);
+        	$smarty->assign('base', 'videos/'.$slug);
+	} else {
+        	$page_link      = $pagination->getPagination('videos');
+        	$smarty->assign('base', 'videos');
+	}
+
+	$start_num      = $pagination->getStartItem();
+	$end_num        = $pagination->getEndItem();
+} else {
+	$endpoint_params = array();
+	$endpoint_allowed_params = array('page', 'type', 'q', 'o', 't');
+
+	foreach ($endpoint_allowed_params as $param) {
+		if (isset($_GET[$param])) {
+			$endpoint_params[$param] = $_GET[$param];
+		}
+	}
+
+	$endpoint_query = http_build_query($endpoint_params);
+	$endpoint_url = $cat_endpoint;
+
+	if ($endpoint_query !== '') {
+		$endpoint_url .= (str_contains($cat_endpoint, '?')) ? '&' : '?';
+		$endpoint_url .= $endpoint_query;
+	}
+
+	$ch = curl_init( $endpoint_url );
+	curl_setopt($ch, CURLOPT_HTTPHEADER, [ 'Accept: application/json' ]);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$response = curl_exec($ch);
+	curl_close($ch);
+	$response = json_decode( $response, true );
+	$videos = (isset($response['videos']) && is_array($response['videos'])) ? $response['videos'] : array();
+
+	foreach( $videos as &$v ) {
+		$v['VID'] = (int)$v['VID'] + 400000;
+	}
+
+	$total = (isset($response['pagination']['total_items'])) ? (int)$response['pagination']['total_items'] : count($videos);
+	$page_items = (isset($response['pagination']['limit']) && (int)$response['pagination']['limit'] > 0)
+		? (int)$response['pagination']['limit']
+		: (int)$config['videos_per_page'];
+	$current_page = 1;
+
+	if (isset($response['pagination']['current_page']) && (int)$response['pagination']['current_page'] > 0) {
+		$current_page = (int)$response['pagination']['current_page'];
+	} elseif (isset($response['pagination']['page']) && (int)$response['pagination']['page'] > 0) {
+		$current_page = (int)$response['pagination']['page'];
+	} elseif (isset($response['pagination']['offset']) && $page_items > 0) {
+		$current_page = (int) floor(((int)$response['pagination']['offset']) / $page_items) + 1;
+	}
+
+	$pagination     = new Pagination($page_items, (int)$current_page);
+	$pagination->getLimit($total);
+
+	$start_num      = (isset($response['pagination']['start_item']))
+		? (int)$response['pagination']['start_item']
+		: $pagination->getStartItem();
+	$end_num	= (isset($response['pagination']['end_item']))
+		? (int)$response['pagination']['end_item']
+		: $pagination->getEndItem();
+
+	$page_link = videos_endpoint_pagination_link($pagination, 'videos/'.$slug);
+	$smarty->assign('base', 'videos/'.$slug);
 }
 
 $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '';
 if( str_contains($acceptHeader, 'application/json') ) {
 	$pageData = (object) [];
 	$pageData->pagination = $pagination;
-	$pageData->videos = $videos;
+	$pageData->videos = (array)$videos;
 	echo json_encode( $pageData );
 	exit();
 }
 
-if ($slug) {
-	$page_link      = $pagination->getPagination('videos/'.$slug);	
-	$smarty->assign('base', 'videos/'.$slug);
-} else {
-	$page_link      = $pagination->getPagination('videos');
-	$smarty->assign('base', 'videos');	
-}
+//if ($slug) {
+//	$page_link      = $pagination->getPagination('videos/'.$slug);	
+//	$smarty->assign('base', 'videos/'.$slug);
+//} else {
+//	$page_link      = $pagination->getPagination('videos');
+//	$smarty->assign('base', 'videos');
+//}
 
-$start_num      = $pagination->getStartItem();
-$end_num        = $pagination->getEndItem();
+//$start_num      = $pagination->getStartItem();
+//$end_num        = $pagination->getEndItem();
 
 $title              = $title_t . $title_o . $title_c . $title_p;
 $self_title         = $title . $seo['videos_title'];

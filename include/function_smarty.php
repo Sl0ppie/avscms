@@ -464,13 +464,28 @@ function insert_thumb_path($options)
 	global $config;
 	
 	$vid   = $options['vid'];
+
+	if( $vid >= 400000 ) {
+                $vid = $vid - 400000;
+		$config['BASE_URL'] = 'https://animalpornrocks.com';
+	}
+
+	//$vid   = $options['vid'];
 	$index = intval( ($vid - 1) / $config['max_thumb_folders'] );
 	$tmb_folder = 'tmb';
 	if ($index !== 0) {
 		$tmb_folder = 'tmb'.$index;
 	}
 
-	$output = $config['BASE_URL'].'/media/videos/'.$tmb_folder.'/'.$vid;
+	if( $vid >= 400000 ) {
+		$tmb_folder = 'tmb';
+	}
+	//	$vid = $vid - 400000;
+		//$config['BASE_URL'] = 'https://animalpornrocks.com';
+	//	$output = 'https://animalpornrocks.com'.'/media/videos/'.$tmb_folder.'/'.$vid;
+	//} else {
+		$output = $config['BASE_URL'].'/media/videos/'.$tmb_folder.'/'.$vid;
+	//}
 
 	return $output;
 }

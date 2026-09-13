@@ -17,6 +17,7 @@
 		<!-- BEGIN SIDEBAR MENU -->	
 		<ul>	
 
+			{if $is_superadmin}
 			<li class="start {if $active_menu == 'dashboard'}active{/if}">
 				<a href="index.php">
 					<i class="icon-custom-home"></i>
@@ -24,14 +25,17 @@
 				</a>
 			</li>
 			{include file='leftmenu/settings.tpl'}
+			{/if}
 			{include file='leftmenu/videos.tpl'}
 			{include file='leftmenu/albums.tpl'}
 			{include file='leftmenu/blogs.tpl'}
 			{include file='leftmenu/users.tpl'}
 			{include file='leftmenu/channels.tpl'}
+			{if $is_superadmin}
 			{include file='leftmenu/notices.tpl'}
 			{if $multi_server == '1'}
 				{include file='leftmenu/servers.tpl'}
+			{/if}
 			{/if}
 		</ul>
 		<!-- END SIDEBAR MENU -->
