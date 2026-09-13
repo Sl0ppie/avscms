@@ -194,7 +194,7 @@ if ( $total_related > 32 ) {
 }
 $pagination     = new Pagination(8, 'p_related_videos_' .$video['VID']. '_');
 $limit          = $pagination->getLimit($total_related);
-$sql            = "SELECT VID, title, duration, addtime, rate, likes, dislikes, viewnumber, type, thumb, thumbs, hd FROM video
+$sql            = "SELECT VID, title, duration, description, addtime, rate, likes, dislikes, viewnumber, type, thumb, thumbs, hd FROM video
                    WHERE active = '1' AND channel = '" .$video['channel']. "' AND VID != " .$vid. "
                    AND ( title LIKE '%" .trim($conn->qStr($video['title']), "'"). "%' " .$sql_add. ")
                    ORDER BY addtime DESC LIMIT " .$limit;
@@ -246,6 +246,76 @@ if ($new_permisions['watch_normal_videos'] == 0) {
 
 
 $video['total_subscribers'] = get_user_total_subscribers($video['UID']);	
+
+function durationToISO8601($seconds)
+{
+    $seconds = intval($seconds);
+    
+    // Calculate time components
+    $hours = intdiv($seconds, 3600);
+    $minutes = intdiv($seconds % 3600, 60);
+    $secs = $seconds % 60;
+    
+    // Build ISO 8601 duration string
+    $iso8601 = 'PT';
+    
+    if ($hours > 0) {
+        $iso8601 .= $hours . 'H';
+    }
+    if ($minutes > 0) {
+        $iso8601 .= $minutes . 'M';
+    }
+    if ($secs > 0 || $iso8601 === 'PT') {
+        $iso8601 .= $secs . 'S';
+    }
+    
+    return $iso8601;
+}
+
+
+$ld_urlTitle = prepare_string( $video['title'] );
+$ld_duration = durationToISO8601( $video['duration'] );
+$ld_description = $video['description'];
+$ld_uploaddate = $video['addtime'];
+$ld_up = new DateTime( "@$ld_uploaddate" );
+$ld_uploaddate = $ld_up->format(DateTime::ATOM);
+$jsonld = <<<EOT
+{
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "{$video['title']}",
+  "description": "{$ld_description}",
+  "thumbnailUrl": [
+    "{$config['BASE_URL']}/media/videos/tmb/{$vid}/default.jpg"
+  ],
+  "uploadDate": "{$ld_uploaddate}",
+  "duration": "{$ld_duration}",
+  "embedUrl": "{$config['BASE_URL']}/embed/{$video['embed_code']}",
+  "url": "{$config['BASE_URL']}/video/{$vid}/{$ld_urlTitle}",
+  "isFamilyFriendly": false,
+  "publisher": {
+    "@type": "Organization",
+    "name": "{$config['site_name']}",
+    "url": "{$config['BASE_URL']}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{$config['BASE_URL']}/images/logo/logo.png"
+    }
+  },
+  "interactionStatistic": {
+    "@type": "InteractionCounter",
+    "interactionType": {
+      "@type": "WatchAction"
+    },
+    "userInteractionCount": {$video['viewnumber']}
+  }
+}
+EOT;
+$smarty->assign('jsonld',$jsonld);
+
+
+//die( var_export($video, true) );
+
 $smarty->assign('errors',$errors);
 $smarty->assign('messages',$messages);
 $smarty->assign('menu', 'videos');
