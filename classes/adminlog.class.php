@@ -26,9 +26,9 @@ class AdminLog
 
     private static function getClientIp()
     {
-        $ip = '';
-        if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] != '') {
-            $ip = trim($_SERVER['REMOTE_ADDR']);
+        $ip = get_client_ip();
+        if ($ip === NULL) {
+            $ip = '';
         }
 
         return substr($ip, 0, 45);

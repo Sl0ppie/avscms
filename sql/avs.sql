@@ -211,7 +211,7 @@ CREATE TABLE `album_categories` (
 
 CREATE TABLE `bans` (
   `ban_id` bigint(20) NOT NULL,
-  `ban_ip` varchar(16) NOT NULL DEFAULT '',
+  `ban_ip` varchar(45) NOT NULL DEFAULT '',
   `ban_date` datetime DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -261,7 +261,7 @@ CREATE TABLE `blog_comments` (
 
 CREATE TABLE `blog_comments_vote_ip` (
   `CID` bigint(20) NOT NULL DEFAULT '0',
-  `ip` int(9) NOT NULL DEFAULT '0'
+  `ip` varchar(45) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -464,7 +464,7 @@ CREATE TABLE `friends` (
 
 CREATE TABLE `guests` (
   `guest_id` bigint(20) NOT NULL,
-  `guest_ip` int(9) NOT NULL DEFAULT '0',
+  `guest_ip` varchar(45) NOT NULL DEFAULT '',
   `last_login` datetime DEFAULT NULL,
   `bandwidth` bigint(20) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -548,7 +548,7 @@ CREATE TABLE `notice_comments` (
 
 CREATE TABLE `notice_comments_vote_ip` (
   `CID` bigint(20) NOT NULL DEFAULT '0',
-  `ip` int(9) NOT NULL DEFAULT '0'
+  `ip` varchar(45) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -622,7 +622,7 @@ CREATE TABLE `photo_comments` (
 
 CREATE TABLE `photo_comments_vote_ip` (
   `CID` bigint(20) NOT NULL DEFAULT '0',
-  `ip` int(9) NOT NULL DEFAULT '0'
+  `ip` varchar(45) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -681,7 +681,7 @@ CREATE TABLE `photo_rating_id` (
 
 CREATE TABLE `photo_rating_ip` (
   `PID` bigint(20) NOT NULL DEFAULT '0',
-  `ip` int(9) NOT NULL DEFAULT '0'
+  `ip` varchar(45) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -806,7 +806,7 @@ CREATE TABLE `signup` (
   `friends_email` varchar(50) NOT NULL DEFAULT '',
   `photo` varchar(100) NOT NULL DEFAULT '',
   `playlist` enum('Public','Private') NOT NULL DEFAULT 'Public',
-  `user_ip` varchar(16) NOT NULL DEFAULT '',
+  `user_ip` varchar(45) NOT NULL DEFAULT '',
   `pwd` varchar(60) NOT NULL DEFAULT '',
   `interested` varchar(12) NOT NULL DEFAULT '',
   `turnon` text,
@@ -970,7 +970,7 @@ CREATE TABLE `user_rating_id` (
 
 CREATE TABLE `user_rating_ip` (
   `UID` bigint(20) NOT NULL DEFAULT '0',
-  `ip` int(9) NOT NULL DEFAULT '0'
+  `ip` varchar(45) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1061,7 +1061,7 @@ CREATE TABLE `video_comments` (
 
 CREATE TABLE `video_comments_vote_ip` (
   `CID` bigint(20) NOT NULL DEFAULT '0',
-  `ip` int(9) NOT NULL DEFAULT '0'
+  `ip` varchar(45) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1109,7 +1109,7 @@ CREATE TABLE `video_rating_id` (
 
 CREATE TABLE `video_rating_ip` (
   `VID` bigint(20) NOT NULL DEFAULT '0',
-  `ip` int(9) NOT NULL DEFAULT '0'
+  `ip` varchar(45) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1166,7 +1166,7 @@ CREATE TABLE `wall_comments` (
 
 CREATE TABLE `wall_comments_vote_ip` (
   `CID` bigint(20) NOT NULL DEFAULT '0',
-  `ip` int(9) NOT NULL DEFAULT '0'
+  `ip` varchar(45) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1885,7 +1885,7 @@ ALTER TABLE `wall_comments`
   MODIFY `CID` bigint(20) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
- ALTER TABLE `video_rating_ip` CHANGE `ip` `ip` BIGINT(50) NOT NULL DEFAULT '0';
+ALTER TABLE `video_rating_ip` CHANGE `ip` `ip` VARCHAR(45) NOT NULL DEFAULT '';
 #fix for encoding table not adding mysql 5.7/8.0 when none is selected
 
 ALTER TABLE `encoding` CHANGE `ios` `ios` ENUM('-profile:v baseline -level 3.0','-profile:v baseline -level 3.1','-profile:v main -level 3.1','-profile:v main -level 4.0','-profile:v high -level 4.0','-profile:v high -level 4.1','-profile:v high -level 4.2','') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;

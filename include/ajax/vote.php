@@ -73,34 +73,32 @@ if ( isset($_POST['type']) && isset($_POST['id']) && isset($_POST['vote'])) {
 		if ($prefix_r  == 'R') {
 			$prefix_r = 'U';
 		}
-		
-		if (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER)) {
-			$ip = ip2long(array_pop(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])));		
-		} else{
-			//Otherwise, use REMOTE_ADDR.
-			$ip = ip2long($_SERVER['REMOTE_ADDR']);
-		}
-		
-		$sql = "SELECT ".$prefix_r."ID FROM ".$type."_rating_ip WHERE ".$prefix_r."ID = " .$id. " AND ip = " .$ip. " LIMIT 1";		
-		$conn->execute($sql);
-		if ( $conn->Affected_Rows() == 1 ) {
-			$data['msg'] = $lang['ajax.rate_already'];
-		} else {
-			if ($vote == 'up') {
-				$likes++;
-				$rate = round(($likes * 100)/($likes + $dislikes));
-			} else {
-				$dislikes++;
-				$rate = round(($likes * 100)/($likes + $dislikes));
-			}
-			$sql = "UPDATE ".$table." SET rate = " .$rate. ", likes = " .$likes. ", dislikes = " .$dislikes. " WHERE ".$prefix."ID = " .$id. " LIMIT 1";	
+
+        $ip = get_client_ip();
+        if ( $ip ) {
+			$sql = "SELECT ".$prefix_r."ID FROM ".$type."_rating_ip WHERE ".$prefix_r."ID = " .$id. " AND ip = " .$conn->qStr($ip). " LIMIT 1";		
 			$conn->execute($sql);
-			$sql = "INSERT INTO ".$type."_rating_ip SET ".$prefix_r."ID = " .$id. ", ip = " .$ip;
-			$conn->execute($sql);				
-			$data['status'] = 2;
-			$data['vote'] = $vote;
-			$data['rate'] = $rate;
-		}		
+			if ( $conn->Affected_Rows() == 1 ) {
+				$data['msg'] = $lang['ajax.rate_already'];
+			} else {
+				if ($vote == 'up') {
+					$likes++;
+					$rate = round(($likes * 100)/($likes + $dislikes));
+				} else {
+					$dislikes++;
+					$rate = round(($likes * 100)/($likes + $dislikes));
+				}
+				$sql = "UPDATE ".$table." SET rate = " .$rate. ", likes = " .$likes. ", dislikes = " .$dislikes. " WHERE ".$prefix."ID = " .$id. " LIMIT 1";	
+				$conn->execute($sql);
+				$sql = "INSERT INTO ".$type."_rating_ip SET ".$prefix_r."ID = " .$id. ", ip = " .$conn->qStr($ip);
+				$conn->execute($sql);				
+				$data['status'] = 2;
+				$data['vote'] = $vote;
+				$data['rate'] = $rate;
+			}
+        } else {
+            $data['msg'] = $lang['ajax.rate_login'];
+        }
 	}
 }
 $data['likes']	  = $likes;

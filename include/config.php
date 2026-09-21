@@ -69,7 +69,7 @@ if ( isset($_SESSION['error']) ) {
     unset($_SESSION['error']);
 }
 
-$remote_ip = ( isset($_SERVER['REMOTE_ADDR']) && long2ip(ip2long($_SERVER['REMOTE_ADDR'])) ) ? $_SERVER['REMOTE_ADDR'] : NULL;
+$remote_ip = get_client_ip();
 if ( isset($_SESSION['uid']) ) {
     $sid    = intval($_SESSION['uid']);
     if ( $remote_ip ) {

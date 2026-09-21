@@ -50,25 +50,29 @@ if ( isset($_POST['type']) && isset($_POST['id']) && isset($_POST['vote'])) {
 			$data['msg'] = $lang['ajax.rate_login'];			
 		}
 	} else {
-		$ip  = ip2long($_SERVER['REMOTE_ADDR']);
-		$sql = "SELECT CID FROM ".$type."_comments_vote_ip WHERE CID = " .$cid. " AND ip = " .$ip. " LIMIT 1";		
-		$conn->execute($sql);
-		if ( $conn->Affected_Rows() == 1 ) {
-			$data['msg'] = $lang['ajax.rate_already'];
-		} else {
-			if ($vote == 'up') {
-				++$rate;
-			} else {
-				--$rate;
-			}
-			$sql = "UPDATE ".$type."_comments SET rate = " .$rate. " WHERE CID = " .$cid. " LIMIT 1";
+		$ip  = get_client_ip();
+        if ( $ip ) {
+			$sql = "SELECT CID FROM ".$type."_comments_vote_ip WHERE CID = " .$cid. " AND ip = " .$conn->qStr($ip). " LIMIT 1";		
 			$conn->execute($sql);
-			$sql = "INSERT INTO ".$type."_comments_vote_ip SET CID = " .$cid. ", ip = " .$ip;
-			$conn->execute($sql);				
-			$data['status'] = 2;
-			$data['vote'] = $vote;
-			$data['rate'] = $rate;
-		}		
+			if ( $conn->Affected_Rows() == 1 ) {
+				$data['msg'] = $lang['ajax.rate_already'];
+			} else {
+				if ($vote == 'up') {
+					++$rate;
+				} else {
+					--$rate;
+				}
+				$sql = "UPDATE ".$type."_comments SET rate = " .$rate. " WHERE CID = " .$cid. " LIMIT 1";
+				$conn->execute($sql);
+				$sql = "INSERT INTO ".$type."_comments_vote_ip SET CID = " .$cid. ", ip = " .$conn->qStr($ip);
+				$conn->execute($sql);				
+				$data['status'] = 2;
+				$data['vote'] = $vote;
+				$data['rate'] = $rate;
+			}
+        } else {
+            $data['msg'] = $lang['ajax.rate_login'];
+        }
 	}
 }
 

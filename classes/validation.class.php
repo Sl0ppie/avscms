@@ -122,9 +122,11 @@ class VValidation
     
     public function ip( $ip )
     {
-        if ( !ip2long($ip) ) {
+        if ( normalize_ip($ip) === NULL ) {
             return false;
         }
+
+        return true;
     }
 }
 ?>

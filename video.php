@@ -239,9 +239,10 @@ $self_keywords      = implode(', ', $video['keyword']) . $seo['video_keywords'];
 
 if (is_numeric($new_permisions['bandwidth']) && $new_permisions['bandwidth'] != '-1') {
 	$user_limit_bandwidth = $new_permisions['bandwidth'];
-	$remote_ip = ip2long($remote_ip);
-	require $config['BASE_DIR']. '/classes/bandwidth.class.php';
-	$guest_limit = VBandwidth::check($remote_ip, intval($video['space']));
+	if ($remote_ip) {
+		require $config['BASE_DIR']. '/classes/bandwidth.class.php';
+		$guest_limit = VBandwidth::check($remote_ip, intval($video['space']));
+	}
 }
 
 
