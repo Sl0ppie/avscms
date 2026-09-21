@@ -69,7 +69,52 @@ if ( isset($_SESSION['error']) ) {
     unset($_SESSION['error']);
 }
 
-$remote_ip = get_client_ip();
+$remote_ip = NULL;
+if (function_exists('get_client_ip')) {
+    $remote_ip = get_client_ip();
+} else {
+    $ip_candidates = array();
+
+    if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        $ip_candidates[] = $_SERVER['HTTP_CF_CONNECTING_IP'];
+    }
+    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip_candidates[] = $_SERVER['HTTP_CLIENT_IP'];
+    }
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        foreach (explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']) as $forwarded_ip) {
+            $ip_candidates[] = $forwarded_ip;
+        }
+    }
+    if (isset($_SERVER['REMOTE_ADDR'])) {
+        $ip_candidates[] = $_SERVER['REMOTE_ADDR'];
+    }
+
+    foreach ($ip_candidates as $ip_candidate) {
+        if (!is_string($ip_candidate)) {
+            continue;
+        }
+
+        $ip_candidate = trim($ip_candidate);
+        if ($ip_candidate === '') {
+            continue;
+        }
+
+        $ip_candidate = trim($ip_candidate, '[]');
+        if (!filter_var($ip_candidate, FILTER_VALIDATE_IP)) {
+            continue;
+        }
+
+        $packed_ip = @inet_pton($ip_candidate);
+        if ($packed_ip === false) {
+            $remote_ip = $ip_candidate;
+        } else {
+            $normalized_ip = @inet_ntop($packed_ip);
+            $remote_ip = ($normalized_ip !== false) ? $normalized_ip : $ip_candidate;
+        }
+        break;
+    }
+}
 if ( isset($_SESSION['uid']) ) {
     $sid    = intval($_SESSION['uid']);
     if ( $remote_ip ) {
