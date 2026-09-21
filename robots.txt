@@ -9,3 +9,4 @@ Disallow: /classes/
 Disallow: /templates/
 Disallow: /scripts/
 Disallow: /addons/
+Disallow: /community/
