@@ -226,11 +226,14 @@ if( !$cat_endpoint ) {
 		$endpoint_url .= $endpoint_query;
 	}
 
+	//die();
 	$ch = curl_init( $endpoint_url );
+	//curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, [ 'Accept: application/json' ]);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	$response = curl_exec($ch);
 	curl_close($ch);
+	//echo '<!-- ' . $response . ' -->';
 	$response = json_decode( $response, true );
 	$videos = (isset($response['videos']) && is_array($response['videos'])) ? $response['videos'] : array();
 
@@ -239,9 +242,7 @@ if( !$cat_endpoint ) {
 	}
 
 	$total = (isset($response['pagination']['total_items'])) ? (int)$response['pagination']['total_items'] : count($videos);
-	$page_items = (isset($response['pagination']['limit']) && (int)$response['pagination']['limit'] > 0)
-		? (int)$response['pagination']['limit']
-		: (int)$config['videos_per_page'];
+	$page_items = $response['pagination']['page_items'];
 	$current_page = 1;
 
 	if (isset($response['pagination']['current_page']) && (int)$response['pagination']['current_page'] > 0) {

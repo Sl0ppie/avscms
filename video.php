@@ -17,18 +17,28 @@ if ( !$vid ) {
     VRedirect::go($config['BASE_URL']. '/notfound/video_missing');
 }
 
-
-if( $vid >= 400000 ) {
+/*
+if( $vid >= 400000 && str_contains($config['BASE_URL'], 'pornsocket') ) {
+	//die();
 	$vid = $vid - 400000;
 	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, "https://animalpornrocks.com/video/".$vid.'/');
+
+	curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    'Host: animalpornrocks.com'
+	));
+
+	curl_setopt($ch, CURLOPT_URL, "http://127.0.0.1/video/".$vid.'/');
+	curl_setopt($ch, CURLOPT_RESOLVE, array(
+    "animalpornrocks.com:80:127.0.0.1"
+	));
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	$response = curl_exec($ch);
   echo $response;
 	exit();
 }
-
-
+*/
+//die('here');
 
 
 $active     = ( $config['approve'] == '1' ) ? " AND v.active = '1'" : NULL;
@@ -38,6 +48,8 @@ $rs         = $conn->execute($sql);
 if ( $conn->Affected_Rows() != 1 ) {
     VRedirect::go($config['BASE_URL']. '/notfound/video_missing');
 }
+
+//die('here');
 
 $video_width  = $rs->fields['width_sd'];
 $video_height = $rs->fields['height_sd'];
@@ -69,6 +81,9 @@ if ($video['embed_code'] == '') {
 		$sql = "SELECT * FROM video v, servers s WHERE v.VID = ".$vid." AND v.server = s.video_url LIMIT 1";
 		$rs  = $conn->execute($sql); 
 		$video_root = $rs->fields['video_url']; 
+
+		if( $vid >= 400000 ) $video_root = 'https://animalpornrocks.com/media/videos';
+
 	}
 	if (!$video_root) {
 		$video_root = $config['BASE_URL']."/media/videos";
@@ -82,6 +97,7 @@ if ($video['embed_code'] == '') {
 		 $vf[$key]['format'] = $f[2];
 		 $vf[$key]['file']   = $video['VID']."_".$vf[$key]['label'].".".$vf[$key]['format'];	 
 		 $vurl = $video_root.'/h264/'.$video['VID']."_".$vf[$key]['label'].".".$vf[$key]['format'];
+		 if( $vid >= 400000 ) $vurl = $video_root.'/h264/'.((int)$video['VID']-400000)."_".$vf[$key]['label'].".".$vf[$key]['format'];
 		 $vf[$key]['url']   = encryptPhp($vurl, $mykey, $iv);
 	}
 	$video['files'] = $vf;
@@ -95,9 +111,11 @@ if ($video['embed_code'] == '') {
 
 	if ($player['timeline_preview'] == 1) {
 		require_once 'classes/sprite.class.php';
+		try {
 		$sprite = new images_to_sprite(get_thumb_dir($vid),get_thumb_dir($vid).'/sprite',$config['img_max_width'],$config['img_max_height']);
 		$sprite->create_sprite();
 		$player['sprite'] = get_thumb_url($vid).'/sprite.jpg';
+		} catch(\Throwable) {  }
 	}
 	$smarty->assign('player', $player);
 
