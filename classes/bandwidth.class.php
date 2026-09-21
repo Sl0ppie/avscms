@@ -8,7 +8,7 @@ class VBandwidth
         $limit = $user_limit_bandwidth*1024*1024;
         $sql   = "SELECT guest_id, bandwidth
                   FROM guests
-                  WHERE guest_ip = " .$ip. "
+                  WHERE guest_ip = " .$conn->qStr($ip). "
                   LIMIT 1";
         $rs    = $conn->execute($sql);
         if ( $conn->Affected_Rows() === 1 ) {
@@ -33,7 +33,7 @@ class VBandwidth
             }
         } else {
             $sql = "INSERT INTO guests (guest_ip, last_login, bandwidth)
-                    VALUES (" .$ip. ", '" .date('Y-m-d h:i:s'). "', " .$size. ")";
+                    VALUES (" .$conn->qStr($ip). ", '" .date('Y-m-d h:i:s'). "', " .$size. ")";
             $conn->execute($sql);
         }
         

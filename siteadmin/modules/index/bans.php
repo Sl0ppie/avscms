@@ -19,8 +19,8 @@ if ( isset($_POST['add_ban']) or $action == 'add' ) {
         $errors[] = 'Ban IP field cannot be empty!';
 		$err['add_ip'] = 1;
 	} else {
-        $ip = ip2long($ban_ip);
-        if ( $ip == -1 || $ip === FALSE ) {
+        $ban_ip = normalize_ip($ban_ip);
+        if ( $ban_ip === NULL ) {
             $errors[] = 'Ban IP is not valid IP address!';
 			$err['add_ip'] = 1;
 		}		

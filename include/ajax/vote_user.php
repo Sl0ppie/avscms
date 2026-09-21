@@ -48,11 +48,16 @@ if ( isset($_POST['item_id']) && isset($_POST['vote']) ) {
         if ( $config['user_rate'] == 'user' ) {
             $sql    = "SELECT UID FROM users_rating_id WHERE UID = " .$user_id. " AND RID = " .$uid. " LIMIT 1";
         } else {
-            $sql    = "SELECT UID FROM users_rating_ip WHERE UID = " .$user_id. " AND ip = " .ip2long($_SERVER['REMOTE_ADDR']). " LIMIT 1";
+            $user_ip = get_client_ip();
+            $sql    = ( $user_ip ) ? "SELECT UID FROM users_rating_ip WHERE UID = " .$user_id. " AND ip = " .$conn->qStr($user_ip). " LIMIT 1" : NULL;
         }
-        
-        $conn->execute($sql);
-        if ( $conn->Affected_Rows() == 1 ) {
+
+        if ( $sql ) {
+            $conn->execute($sql);
+        }
+        if ( !$sql ) {
+            $data['msg'] = $lang['ajax.rate_login'];
+        } elseif ( $conn->Affected_Rows() == 1 ) {
             $data['msg']    = $lang['ajax.rate_already'];
         } else {
 
@@ -73,7 +78,7 @@ if ( isset($_POST['item_id']) && isset($_POST['vote']) ) {
             if ( $config['user_rate'] == 'user' ) {
                 $sql    = "INSERT INTO users_rating_id SET UID = " .$user_id. ", RID = " .$uid;
             } else {
-                $sql    = "INSERT INTO users_rating_ip SET UID = " .$user_id. ", ip = " .ip2long($_SERVER['REMOTE_ADDR']);
+                $sql    = "INSERT INTO users_rating_ip SET UID = " .$user_id. ", ip = " .$conn->qStr($user_ip);
             }
             $conn->execute($sql);
         }

@@ -24,6 +24,63 @@ function get_request_arg($search, $type = 'INT')
     return ( $type == 'INT' ) ? intval($arg) : $arg;
 }
 
+function normalize_ip($ip)
+{
+    if (!is_string($ip)) {
+        return NULL;
+    }
+
+    $ip = trim($ip);
+    if ($ip === '') {
+        return NULL;
+    }
+
+    $ip = trim($ip, '[]');
+    if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        return NULL;
+    }
+
+    $packed = @inet_pton($ip);
+    if ($packed === false) {
+        return $ip;
+    }
+
+    $normalized = @inet_ntop($packed);
+    return ($normalized !== false) ? $normalized : $ip;
+}
+
+function get_client_ip()
+{
+    $candidates = array();
+
+    if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        $candidates[] = $_SERVER['HTTP_CF_CONNECTING_IP'];
+    }
+
+    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+        $candidates[] = $_SERVER['HTTP_CLIENT_IP'];
+    }
+
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        foreach (explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']) as $forwarded_ip) {
+            $candidates[] = $forwarded_ip;
+        }
+    }
+
+    if (isset($_SERVER['REMOTE_ADDR'])) {
+        $candidates[] = $_SERVER['REMOTE_ADDR'];
+    }
+
+    foreach ($candidates as $candidate) {
+        $ip = normalize_ip($candidate);
+        if ($ip !== NULL) {
+            return $ip;
+        }
+    }
+
+    return NULL;
+}
+
 function get_categories()
 {
     global $conn;

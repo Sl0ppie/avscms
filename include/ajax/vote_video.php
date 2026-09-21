@@ -56,14 +56,17 @@ if ( isset($_POST['item_id']) && isset($_POST['vote']) ) {
             $sql    = "SELECT VID FROM video_vote_users WHERE VID = '" .$video_id. "' AND UID = '" .$uid. "' LIMIT 1";
             $data['debug'] = $sql;
         } else { 
-            $user_ip = getUserIP();
-            $ip     = ip2long($user_ip);
-            $sql    = "SELECT VID FROM video_vote_ip WHERE VID = '" .$video_id. "' AND ip = '" .$ip. "' LIMIT 1";
+            $user_ip = get_client_ip();
+            $sql    = ( $user_ip ) ? "SELECT VID FROM video_vote_ip WHERE VID = '" .$video_id. "' AND ip = " .$conn->qStr($user_ip). " LIMIT 1" : NULL;
+        }
+
+        if ( $sql ) {
+            $conn->execute($sql);
         }
         
-        $conn->execute($sql);
-        
-        if ( $conn->Affected_Rows() > 0 ) {
+        if ( !$sql ) {
+            $data['msg'] = $lang['ajax.rate_login'];
+        } elseif ( $conn->Affected_Rows() > 0 ) {
             $data['msg']    = $lang['ajax.rate_already'];
         } else {
 
@@ -84,7 +87,7 @@ if ( isset($_POST['item_id']) && isset($_POST['vote']) ) {
             if ( $config['video_rate'] == 'user' ) {
                 $sql    = "INSERT INTO video_vote_users VALUES ($video_id, $uid )";
             } else {
-                $sql    = "INSERT INTO video_vote_ip VALUES ($video_id, $ip)";
+                $sql    = "INSERT INTO video_vote_ip VALUES ($video_id, " .$conn->qStr($user_ip). ")";
             }
             $conn->execute($sql);
         }
@@ -98,22 +101,6 @@ if ( isset($_POST['item_id']) && isset($_POST['vote']) ) {
 	$data['dislikes']    = $dislikes;	
 	$data['construct']   = construct_vote($likes, $dislikes);
 	//$data['user_ip'] = $user_ip;
-}
-
-function getUserIP() {
-	if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
-			  $_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
-			  $_SERVER['HTTP_CLIENT_IP'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
-	}
-	$client  = @$_SERVER['HTTP_CLIENT_IP'];
-	$forward = @$_SERVER['HTTP_X_FORWARDED_FOR'];
-	$remote  = $_SERVER['REMOTE_ADDR'];
-
-	if(filter_var($client, FILTER_VALIDATE_IP)) { $ip = $client; }
-	elseif(filter_var($forward, FILTER_VALIDATE_IP)) { $ip = $forward; }
-	else { $ip = $remote; }
-
-	return $ip;
 }
 echo json_encode($data);
 die();

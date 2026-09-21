@@ -6,7 +6,7 @@ class Remember
     {    
         if (!isset($_SESSION['uid']) && isset($_COOKIE['remember'])) {
             $browser    = (isset($_SERVER['HTTP_USER_AGENT'])) ? sha1($_SERVER['HTTP_USER_AGENT']) : NULL;
-            $ip         = (isset($_SERVER['REMOTE_ADDR']) && ip2long($_SERVER['REMOTE_ADDR'])) ? ip2long($_SERVER['REMOTE_ADDR']) : NULL;
+            $ip         = get_client_ip();
             $cookie     = unserialize($_COOKIE['remember']);
             if (is_array($cookie)) {
                 if ($cookie['check'] == sha1($browser . $ip)) {
@@ -43,7 +43,7 @@ class Remember
     public static function set($username, $password)
     {
         $browser    = (isset($_SERVER['HTTP_USER_AGENT'])) ? sha1($_SERVER['HTTP_USER_AGENT']) : NULL;
-        $ip         = (isset($_SERVER['REMOTE_ADDR']) && ip2long($_SERVER['REMOTE_ADDR'])) ? ip2long($_SERVER['REMOTE_ADDR']) : NULL;
+        $ip         = get_client_ip();
         $user       = array('username' => $username, 'password' => $password, 'check' => sha1($browser . $ip));
         $cookie     = serialize($user);
         setcookie('remember', $cookie, time()+60*60*24*100, '/');
