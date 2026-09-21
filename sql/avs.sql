@@ -1885,7 +1885,17 @@ ALTER TABLE `wall_comments`
   MODIFY `CID` bigint(20) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
+ALTER TABLE `bans` CHANGE `ban_ip` `ban_ip` VARCHAR(45) NOT NULL DEFAULT '';
+ALTER TABLE `blog_comments_vote_ip` CHANGE `ip` `ip` VARCHAR(45) NOT NULL DEFAULT '';
+ALTER TABLE `guests` CHANGE `guest_ip` `guest_ip` VARCHAR(45) NOT NULL DEFAULT '';
+ALTER TABLE `notice_comments_vote_ip` CHANGE `ip` `ip` VARCHAR(45) NOT NULL DEFAULT '';
+ALTER TABLE `photo_comments_vote_ip` CHANGE `ip` `ip` VARCHAR(45) NOT NULL DEFAULT '';
+ALTER TABLE `photo_rating_ip` CHANGE `ip` `ip` VARCHAR(45) NOT NULL DEFAULT '';
+ALTER TABLE `signup` CHANGE `user_ip` `user_ip` VARCHAR(45) NOT NULL DEFAULT '';
+ALTER TABLE `user_rating_ip` CHANGE `ip` `ip` VARCHAR(45) NOT NULL DEFAULT '';
+ALTER TABLE `video_comments_vote_ip` CHANGE `ip` `ip` VARCHAR(45) NOT NULL DEFAULT '';
 ALTER TABLE `video_rating_ip` CHANGE `ip` `ip` VARCHAR(45) NOT NULL DEFAULT '';
+ALTER TABLE `wall_comments_vote_ip` CHANGE `ip` `ip` VARCHAR(45) NOT NULL DEFAULT '';
 #fix for encoding table not adding mysql 5.7/8.0 when none is selected
 
 ALTER TABLE `encoding` CHANGE `ios` `ios` ENUM('-profile:v baseline -level 3.0','-profile:v baseline -level 3.1','-profile:v main -level 3.1','-profile:v main -level 4.0','-profile:v high -level 4.0','-profile:v high -level 4.1','-profile:v high -level 4.2','') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
