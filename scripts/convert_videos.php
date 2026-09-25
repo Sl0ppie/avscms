@@ -26,7 +26,7 @@ echo "Vidoe ID: $vid\n";
 echo "Video Path: $video_path\n\n";
 
 // Error Checks
-if (!preg_match("/^[0-9]{1,5}\.[a-z0-9]{2,4}$/i", $video_name)) {
+if (!preg_match("/^[0-9]{1,6}\.[a-z0-9]{2,4}$/i", $video_name)) {
 	echo "Video Name: $video_name is invalid. Err #1. Exiting ..."; exit();
 } else {
 	$ffp_data = get_ffprobe_data($video_path);
