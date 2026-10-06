@@ -287,7 +287,7 @@ if( str_contains($acceptHeader, 'application/json') ) {
 //$start_num      = $pagination->getStartItem();
 //$end_num        = $pagination->getEndItem();
 
-$title              = $title_t . $title_o . $title_c . $title_p;
+$title              = $title_t . $title_o . $title_c . (($config['BASE_URL'] == 'https://animalpornrocks.com') ? ' Aniaml Porn ' : '') . $title_p;
 $self_title         = $title . $seo['videos_title'];
 $self_description   = $title . $seo['videos_desc'];
 $self_keywords      = $title . $seo['videos_keywords'];
